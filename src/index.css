@@ -1,0 +1,356 @@
+@import "./assets/css/animate.min.css";
+@import "./assets/css/popup.css";
+
+/* <!--====== Bootstrap css ======--> */
+@import "./assets/css/bootstrap.min.css";
+/* <!--====== Fontawesome css ======--> */
+@import "./assets/css/font-awesome.min.css";
+/* <!--====== Flaticon css ======--> */
+@import "./assets/css/flaticon.css";
+/* <!--====== Slick Css ======--> */
+@import "./assets/css/slick.min.css";
+/* <!--====== Lity Css ======--> */
+@import "./assets/css/lity.min.css";
+/* <!--====== Main css ======--> */
+@import "./assets/css/main.css";
+/* <!--====== Responsive css ======--> */
+@import "./assets/css/responsive.css";
+/* <!--====== Login css ======--> */
+@import "./assets/css/login.css";
+
+@import url(https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900);
+
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900");
+
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  font-weight: normal;
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+a {
+  transition: 0.3s all ease;
+  color: #a3f7bf;
+}
+
+a:hover,
+a:focus {
+  text-decoration: none !important;
+  outline: none !important;
+  box-shadow: none;
+}
+
+button {
+  transition: 0.3s all ease;
+}
+
+button:hover,
+button:focus {
+  text-decoration: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5 {
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: "Poppins", Arial, sans-serif;
+  color: #000;
+}
+
+.ftco-no-pt {
+  padding-top: 0;
+}
+
+.ftco-no-pb {
+  padding-bottom: 0;
+}
+
+.heading-section {
+  font-size: 28px;
+  color: #000;
+}
+
+.heading-section small {
+  font-size: 18px;
+}
+
+.img {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.btn-img {
+  width: 100px;
+  height: 100px;
+}
+
+.btn-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: inline-block;
+  border: none;
+  /* box-shadow: 0px 10px 34px -20px rgba(0, 0, 0, 0.41); */
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.btn-group .dropdown-menu {
+  border: none;
+  background: #fff;
+  box-shadow: 0px 10px 34px -20px rgba(0, 0, 0, 0.41);
+  padding: 0;
+  width: fit-content;
+  left: -50% !important;
+
+  transform: translateX(-50%) !important;
+  margin-top: 65px;
+  position: absolute;
+}
+
+.btn-group .dropdown-menu::before,
+.btn-group .dropdown-menu::after {
+  content: " ";
+  display: block;
+  border-style: solid;
+  border-width: 0 0.7em 0.8em 0.7em;
+  border-color: transparent;
+  position: absolute;
+  left: 72%;
+  margin-left: -0.7em;
+  z-index: -1;
+}
+
+.btn-group .dropdown-menu::before {
+  top: -0.8em;
+  border-bottom-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-group .dropdown-menu::after {
+  top: -0.7em;
+  border-bottom-color: #fff;
+}
+
+.dropdown-item {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 400;
+  padding: 0 30px 0 0;
+  white-space: normal;
+}
+
+.dropdown-item .icon {
+  width: 60px;
+  height: 60px;
+  background: #a3f7bf;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.dropdown-item .icon span {
+  font-size: 24px;
+  color: #fff;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: #a3f7bf;
+  color: #fff;
+}
+
+.dropdown-item:hover .icon,
+.dropdown-item:focus .icon {
+  background: #8ae0a6;
+}
+.user-name {
+  font-weight: 500;
+  font-size: 16px;
+  color: #333;
+  margin-right: 0.5rem;
+  width: max-content;
+  display: inline-block;
+}
+
+/* Impact Section Styles */
+.impact-section {
+  padding: 80px 0;
+  background-color: #f9f9f9;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #2a2a2a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: 20px;
+  color: #555;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.impact-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 40px;
+}
+
+.impact-content p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.impact-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.impact-list li {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.impact-list li:before {
+  content: "✓";
+  color: #4CAF50;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+/* Features Section */
+.features-section {
+  background-color: #e8f4fc;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.features-section p {
+  font-size: 18px;
+  color: #2a5885;
+  font-style: italic;
+  margin: 0;
+}
+
+/* FAQ Section Styles */
+.faq-section {
+  padding: 80px 0;
+  background-color: #fff;
+}
+
+.faq-item {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.faq-item h4 {
+  font-size: 20px;
+  color: #2a2a2a;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.faq-item h4:hover {
+  color: #4CAF50;
+}
+
+.faq-item p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 0;
+}
+
+.faq-footer {
+  margin-top: 50px;
+  text-align: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.faq-footer p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.faq-footer a {
+  color: #4CAF50;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.faq-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 28px;
+  }
+  
+  .section-subtitle {
+    font-size: 18px;
+  }
+  
+  .impact-content,
+  .features-section {
+    padding: 20px;
+  }
+  
+  .faq-item h4 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .impact-section,
+  .faq-section {
+    padding: 60px 0;
+  }
+  
+  .section-title {
+    font-size: 24px;
+  }
+}
