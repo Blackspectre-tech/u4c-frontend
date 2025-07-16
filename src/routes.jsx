@@ -10,7 +10,7 @@ import PrivacyPolicy from "./pages/privacy";
 import PasswordResetSuccess from "./pages/password";
 
 const routes = [
-  { path: "/index-2", Component: Home2 },
+  { path: "/", Component: Home2 },
   { path: "/about", Component: About },
   //   { path: "/forgot-password", Component: ForgotPassword },
   // { path: "/login", Component: Login },
