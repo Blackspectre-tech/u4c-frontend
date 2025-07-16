@@ -1,229 +1,188 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import Slider from "react-slick";
-import Counter from "../components/Counter";
-import VideoPopup from "../components//VideoPopup";
+import Counter from "../components//Counter";
 import Layout from "../layouts/Layout";
-import { imageTextBlockSlider } from "../sliderProps";
+import { projectSliderOne, projectSliderTwo } from "../sliderProps";
+import { useEffect } from "react";
+import bg1 from "../assets/img/U4C4.png";
+import bg2 from "../assets/img/U4C3.png";
+import bg3 from "../assets/img/01.png";
+import heroline from "../assets/img/hero/hero-line.png";
+import heroline2 from "../assets/img/hero/hero-line-2.png";
+import bg4 from "../assets/img/tamarind2.jpeg";
+import img2 from "../assets/img/tamarind2.jpeg";
+import bg6 from "../assets/img/01.png";
+import bg7 from "../assets/img/bg.png";
+import img4 from "../assets/img/icons/Start A Project.svg";
+import img7 from "../assets/img/icons/Donate.svg";
+import tan2 from "../assets/img/icons/Transparent by Design.svg";
+import tan1 from "../assets/img/icons/Impact-First.svg";
+import tans from "../assets/img/icons/Milestone-Based Giving_1.svg";
+import tan3 from "../assets/img/icons/Powered by Purposeful Tech.svg";
 
-const Index2 = () => {
-  const [video, setVideo] = useState(false);
+const Index = () => {
+  useEffect(() => {
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".bg-slide");
+
+    const intervalId = setInterval(() => {
+      slides[currentSlide]?.classList.remove("active");
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide]?.classList.add("active");
+    }, 5000);
+
+    // Cleanup function
+    return () => clearInterval(intervalId);
+  }, []);
   return (
-    <Layout transparentHeader topSecondaryBg>
-      {video && <VideoPopup close={setVideo} />}
-      <section className="hero-area-two">
-        <div className="container">
-          <div className="row align-items-center">
-            <div className="col-lg-6 col-md-8 col-sm-11">
-              <div className="hero-text">
-                <h1
-                  className="title "
-                  data-aos="fade-left"
-                  data-aos-delay="200"
-                >
-                  SYHM 525O VR Box Smart Phone VR Box
-                </h1>
-                <p className="" data-aos="fade-left" data-aos-delay="300">
-                  Sedut perspiciatis unde omnis iste natus voluptatem
-                  accusantium dolore dantiumy totam rem apeam eaque ipsa
-                </p>
-                <ul className="hero-btn">
-                  <li data-aos="fade-up" data-aos-delay="400">
-                    <Link to="/project-2" className="main-btn">
-                      Explore Projects <i className="far fa-arrow-right" />
-                    </Link>
-                  </li>
-                  <li data-aos="fade-up" data-aos-delay="500">
-                    <a
-                      href="#"
-                      className="video-btn"
-                      onClick={() => setVideo(true)}
-                    >
-                      <i className="fas fa-play" />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div
-              className="col-lg-6 col-md-8 col-sm-10 mx-auto "
-              data-aos="fade-right"
-              data-aos-delay="200"
-            >
-              <div className="hero-img text-lg-right">
-                <img src="assets/img/hero/hero-two-img.png" alt="Img" />
-              </div>
-            </div>
-          </div>
+    <Layout transparentHeader transparentTop>
+      <section className="hero-area-one">
+        <div className="hero-background-slider">
+          <div className="bg-overlay"></div>
+          <div
+            className="bg-slide active"
+            style={{
+              backgroundImage: `url(${bg1})`,
+            }}
+          ></div>
+          <div
+            className="bg-slide"
+            style={{
+              backgroundImage: `url(${bg2})`,
+            }}
+          ></div>
+          <div
+            className="bg-slide"
+            style={{
+              backgroundImage: `url(${bg3})`,
+            }}
+          ></div>
         </div>
-        <div className="hero-shapes">
-          <div className="hero-line-one">
-            <img src="assets/img/hero/hero-line-3.png" alt="Line" />
+        <div className="hero-text">
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-xl-10">
+                <span
+                  className="tagline "
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                >
+                  Fund Projects. Track Impact. Be the Change.
+                </span>
+                <h1 className="title " data-aos="fade-up" data-aos-delay="400">
+                  Your Support, Their Future
+                </h1>
+                <p className="mb-10" data-aos="fade-up" data-aos-delay="400">
+                  We partner with grassroots organizations to empower you to
+                  choose where your support goes. Each project is aligned with
+                  our mission to bring hope, dignity, and resources to
+                  underserved communities. From education and clean water to
+                  healthcare and environmental resilience — your impact starts
+                  here.
+                </p>
+                <Link
+                  to="/"
+                  className="main-btn "
+                  data-aos="fade-up"
+                  data-aos-delay="500"
+                >
+                  Explore Projects <i className="far fa-arrow-right" />
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="hero-line-two">
-            <img src="assets/img/hero/hero-line-2.png" alt="Line" />
+          <div className="hero-shapes">
+            <div className="hero-line-one">
+              <img src={heroline} alt="Line" />
+            </div>
+            <div className="hero-line-two">
+              <img src={heroline2} alt="Line" />
+            </div>
+            <div className="dot-one" />
+            <div className="dot-two" />
           </div>
-          <div className="dot-one" />
-          <div className="dot-two" />
         </div>
       </section>
       {/*====== Hero Area End ======*/}
-      {/*====== About Section Start ======*/}
-      <section className="about-section-two">
-        <div className="about-form-area">
-          <div className="container">
-            <div className="about-donation-form">
-              <div className="donation-heading">
-                <h3 className="title">Rise Your Hand</h3>
-                <span className="shadow-text">Support</span>
-              </div>
-              <form onSubmit={(e) => e.preventDefault()} action="#">
-                <div className="form-wrap">
-                  <ul className="donation-amount">
-                    <li>$5</li>
-                    <li>$50</li>
-                    <li>$180</li>
-                    <li>$500</li>
-                    <li>$1000</li>
-                  </ul>
-                  <button type="submit" className="main-btn btn-white">
-                    Donate Now <i className="far fa-arrow-right" />
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div
-              className="about-video "
-              data-aos="fade-down"
-              data-aos-delay="200"
-            >
-              <a href="#" className="video-btn" onClick={() => setVideo(true)}>
-                <i className="fas fa-play" />
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="about-text-area">
-          <div className="container">
-            <div className="row align-items-end justify-content-xl-start">
-              <div className="col-xl-5 col-lg-7 col-md-8 order-xl-2">
-                <div className="about-text">
-                  <div className="common-heading mb-30">
-                    <span className="tagline">
-                      <i className="fas fa-plus" /> About us
-                      <span className="heading-shadow-text">About Us</span>
-                    </span>
-                    <h2 className="title">
-                      We Help How To Improve Product Marketing
-                    </h2>
-                  </div>
-                  <p>
-                    Sedut perspiciatis unde omnis iste natus voluptatem accusan
-                    tium dolore dantiumy totam rem apeam, eaque ipsa quaventore
-                    veritatis quasi architecto beatae.
-                  </p>
-                  <ul className="check-list mt-30">
-                    <li>
-                      <h5 className="title">Highest Success Rates</h5>
-                      <p>Quis autem vel eum iure reprehenderit quin</p>
-                    </li>
-                    <li>
-                      <h5 className="title">Raise Funds With Crowdfunding</h5>
-                      <p>Voluptate esse quam nihil molestiae consequatur</p>
-                    </li>
-                    <li>
-                      <h5 className="title">Millions in Funding</h5>
-                      <p>Accusan tium dolore dantiumy totam apeam</p>
-                    </li>
-                  </ul>
-                  <Link to="/about" className="main-btn btn-dark mt-40">
-                    Learn More <i className="far fa-arrow-right" />
-                  </Link>
-                </div>
-              </div>
-              <div className="col-xl-5 order-xl-1 " data-aos="fade-up">
-                <div className="about-curved-img">
-                  <img src="assets/img/about/man-with-laptop.png" alt="Image" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="about-shape">
-          <img src="assets/img/about/about-shape.png" alt="Shape" />
-        </div>
-      </section>
-      {/*====== About Section End ======*/}
       {/*====== Project Section Start ======*/}
-      <section className="project-section project-section-two">
-        <div className="container fluid-extra-padding">
-          <div className="common-heading text-center color-version-white mb-30">
+      <section className="project-section project-section-extra-gap">
+        <div className="container-fluid fluid-extra-padding">
+          <div className="common-heading text-center color-version-white mb-60">
             <span className="tagline">
-              <i className="fas fa-plus" /> Popular Projects
-              <span className="heading-shadow-text">Our Projects</span>
+              <i className="fas fa-plus" /> Popular Campaigns
+              <span className="heading-shadow-text">Our Campaigns</span>
             </span>
-            <h2 className="title">Explore Our Projects</h2>
+            <h2 className=" ">Explore Our Campaigns</h2>
           </div>
-          <div className="row justify-content-center project-items project-style-one">
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
+          <div className="row project-items no-shadow">
+            <div className="col-12 col-sm-6 col-md-4 mb-4">
+              <div className="project-item">
                 <div
                   className="thumb"
                   style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-01.jpg)",
+                    backgroundImage: `url(${bg4})`,
                   }}
                 />
                 <div className="content">
+                  <h2 className="title">
+                    <Link to="/project-details">
+                      Tamarind Community Donation Drive
+                    </Link>
+                  </h2>
                   <div className="cats">
-                    <Link to="/explore">Video &amp; Movies</Link>
+                    <Link to="/">Ongoing</Link>
                   </div>
                   <div className="author">
-                    <img src="assets/img/author-thumbs/01.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
+                    <img src={img2} alt="Tamarind Logo" />
+                    <Link to="/"> tamarind.initiative@gmail.com</Link>
                   </div>
                   <h5 className="title">
                     <Link to="/project-details">
-                      Best Romantic &amp; Action English Movie Release in 2022.
+                      Donate food, clothing, shoes, blankets, toiletries, and
+                      more to help people facing hardship in Yobe State.
                     </Link>
                   </h5>
                   <div className="project-stats">
                     <div className="stats-value">
                       <span className="value-title">
-                        Raised of <span className="value">$59,689</span>
+                        Raised of <span className="value">$12,480</span>
                       </span>
-                      <span className="stats-percentage">79%</span>
+                      <span className="stats-percentage">42%</span>
                     </div>
-                    <div className="stats-bar" data-value={79}>
+                    <div className="stats-bar" data-value={42}>
                       <div className="bar-line" />
                     </div>
                   </div>
                   <span className="date">
-                    <i className="far fa-calendar-alt" /> 25 February 2021
+                    <i className="far fa-calendar-alt" /> 14 June 2025
                   </span>
                 </div>
               </div>
             </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
+
+            <div className=" col-12 col-sm-6 col-md-4 mb-4">
+              <div className="project-item">
                 <div
                   className="thumb"
                   style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-02.jpg)",
+                    backgroundImage: `url(${bg6})`,
                   }}
                 />
                 <div className="content">
+                  <h2 className="title">
+                    <Link to="/"> Good Care and Well Being</Link>
+                  </h2>
                   <div className="cats">
-                    <Link to="/explore">Educations</Link>
+                    <Link to="/">Ongoing</Link>
                   </div>
                   <div className="author">
-                    <img src="assets/img/author-thumbs/02.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
+                    <img src={bg6} alt="Thumb" />
+                    <Link to="/"> lrichards.dev@gmail.com</Link>
                   </div>
                   <h5 className="title">
-                    <Link to="/project-details">
-                      Needs Close Up Students Class Room In University
+                    <Link to="/">
+                      Description In a world where health is truly wealth,
+                      access ...
                     </Link>
                   </h5>
                   <div className="project-stats">
@@ -243,26 +202,29 @@ const Index2 = () => {
                 </div>
               </div>
             </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
+            <div className=" col-12 col-sm-6 col-md-4 mb-4">
+              <div className="project-item">
                 <div
                   className="thumb"
                   style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-03.jpg)",
+                    backgroundImage: `url(${bg6})`,
                   }}
                 />
                 <div className="content">
+                  <h2 className="title">
+                    <Link to="/">Support Education</Link>
+                  </h2>
                   <div className="cats">
-                    <Link to="/explore">Technology</Link>
+                    <Link to="/">Ongoing</Link>
                   </div>
                   <div className="author">
-                    <img src="assets/img/author-thumbs/03.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
+                    <img src={bg6} alt="Thumb" />
+                    <Link to="/"> lrichards.dev@gmail.com</Link>
                   </div>
                   <h5 className="title">
-                    <Link to="/project-details">
-                      Original Shinecon VR Pro Virtual Reality 3D Glasses VRBOX
+                    <Link to="/">
+                      Summary The COVID19 crisis has deeply impacted southern
+                      Afri ...
                     </Link>
                   </h5>
                   <div className="project-stats">
@@ -270,126 +232,9 @@ const Index2 = () => {
                       <span className="value-title">
                         Raised of <span className="value">$59,689</span>
                       </span>
-                      <span className="stats-percentage">85%</span>
+                      <span className="stats-percentage">87%</span>
                     </div>
-                    <div className="stats-bar" data-value={85}>
-                      <div className="bar-line" />
-                    </div>
-                  </div>
-                  <span className="date">
-                    <i className="far fa-calendar-alt" /> 25 February 2021
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
-                <div
-                  className="thumb"
-                  style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-04.jpg)",
-                  }}
-                />
-                <div className="content">
-                  <div className="cats">
-                    <Link to="/explore">Clothes</Link>
-                  </div>
-                  <div className="author">
-                    <img src="assets/img/author-thumbs/01.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
-                  </div>
-                  <h5 className="title">
-                    <Link to="/project-details">
-                      Fundraising For The People And Causes You Care About
-                    </Link>
-                  </h5>
-                  <div className="project-stats">
-                    <div className="stats-value">
-                      <span className="value-title">
-                        Raised of <span className="value">$59,689</span>
-                      </span>
-                      <span className="stats-percentage">83%</span>
-                    </div>
-                    <div className="stats-bar" data-value={83}>
-                      <div className="bar-line" />
-                    </div>
-                  </div>
-                  <span className="date">
-                    <i className="far fa-calendar-alt" /> 25 February 2021
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
-                <div
-                  className="thumb"
-                  style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-05.jpg)",
-                  }}
-                />
-                <div className="content">
-                  <div className="cats">
-                    <Link to="/explore">Covid -19</Link>
-                  </div>
-                  <div className="author">
-                    <img src="assets/img/author-thumbs/02.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
-                  </div>
-                  <h5 className="title">
-                    <Link to="/project-details">
-                      COVID-19 Vaccine Have Already Begun Introduced Countries
-                    </Link>
-                  </h5>
-                  <div className="project-stats">
-                    <div className="stats-value">
-                      <span className="value-title">
-                        Raised of <span className="value">$59,689</span>
-                      </span>
-                      <span className="stats-percentage">93%</span>
-                    </div>
-                    <div className="stats-bar" data-value={93}>
-                      <div className="bar-line" />
-                    </div>
-                  </div>
-                  <span className="date">
-                    <i className="far fa-calendar-alt" /> 25 February 2021
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
-              <div className="project-item mt-30">
-                <div
-                  className="thumb"
-                  style={{
-                    backgroundImage:
-                      "url(assets/img/project/project-grid-06.jpg)",
-                  }}
-                />
-                <div className="content">
-                  <div className="cats">
-                    <Link to="/explore">Business</Link>
-                  </div>
-                  <div className="author">
-                    <img src="assets/img/author-thumbs/03.jpg" alt="Thumb" />
-                    <Link to="/project-details">James W. Barrows</Link>
-                  </div>
-                  <h5 className="title">
-                    <Link to="/project-details">
-                      Mobile First Is Just Not Goodies Enough Meet Journey
-                    </Link>
-                  </h5>
-                  <div className="project-stats">
-                    <div className="stats-value">
-                      <span className="value-title">
-                        Raised of <span className="value">$59,689</span>
-                      </span>
-                      <span className="stats-percentage">70%</span>
-                    </div>
-                    <div className="stats-bar" data-value={70}>
+                    <div className="stats-bar" data-value={87}>
                       <div className="bar-line" />
                     </div>
                   </div>
@@ -403,292 +248,221 @@ const Index2 = () => {
         </div>
       </section>
       {/*====== Project Section End ======*/}
-      {/*====== Feature Section Start ======*/}
-      <section className="feature-section feature-section-one section-gap">
+      {/*====== Counter Area Start ======*/}
+      <section className="emergency-project-with-cta">
         <div className="container">
-          <div className="row justify-content-lg-between justify-content-center align-items-center">
-            <div className="col-xl-4 col-lg-5 col-md-8 col-sm-10">
-              <div className="feature-content mb-md-50">
-                <div className="common-heading mb-45">
-                  <span className="tagline">
-                    <i className="fas fa-plus" /> What we do
-                    <span className="heading-shadow-text">Features</span>
-                  </span>
-                  <h2 className="title">Why Choose us</h2>
-                </div>
-                {/* Fancy Icon List */}
-                <div className="fancy-icon-list">
-                  <div className="fancy-list-item">
-                    <div className="icon">
-                      <i className="flaticon-debit-card" />
-                    </div>
-                    <div className="content">
-                      <h4 className="title">Fast &amp; Easy Payouts</h4>
-                      <p>
-                        Sed ut perspiciatis unde omnis iste natus voluptatem
-                        accusan doloremque
-                      </p>
-                    </div>
-                  </div>
-                  <div className="fancy-list-item">
-                    <div className="icon">
-                      <i className="flaticon-payment" />
-                    </div>
-                    <div className="content">
-                      <h4 className="title">Global Payment Processing</h4>
-                      <p>
-                        Sed ut perspiciatis unde omnis iste natus voluptatem
-                        accusan doloremque
-                      </p>
-                    </div>
-                  </div>
-                  <div className="fancy-list-item">
-                    <div className="icon">
-                      <i className="flaticon-wallet-1" />
-                    </div>
-                    <div className="content">
-                      <h4 className="title">Many Payment Options</h4>
-                      <p>
-                        Sed ut perspiciatis unde omnis iste natus voluptatem
-                        accusan doloremque
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-7 col-md-10">
-              <div className="funden-video with-video-shape">
-                <img src="assets/img/video/02.jpg" alt="Image" />
-                <a
-                  href="#"
-                  className="video-popup"
-                  onClick={() => setVideo(true)}
-                >
-                  <i className="fas fa-play" />
-                </a>
-                <img
-                  src="assets/img/video/video-shape.png"
-                  alt="Image"
-                  className="video-shape"
-                />
-              </div>
-            </div>
+          <div className="common-heading text-center mb-60">
+            <span className="tagline">
+              <i className="fas fa-plus" /> Get Started Now
+              <span className="heading-shadow-text">Start Now</span>
+            </span>
+            <h2 className="title">Fund A Project</h2>
           </div>
         </div>
-      </section>
-      {/*====== Feature Section End ======*/}
-      {/*====== Counter With Image Text Block Start ======*/}
-      <section className="counter-with-image-text-block">
-        <div className="image-text-block-area">
+        {/* FULL-WIDTH CTA BOX - NOT inside container */}
+        <div
+          className="cta-box cta-double-content full-width"
+          style={{ backgroundImage: `url(${bg7})` }}
+        >
           <div className="container">
-            <Slider
-              {...imageTextBlockSlider}
-              className="image-text-block-slider"
-            >
-              <div className="single-slider">
-                <div className="image-text-block text-block-one">
-                  <div className="block-img">
-                    <img src="assets/img/text-block/01.jpg" alt="Image" />
-                  </div>
-                  <div className="block-content">
-                    <div className="common-heading mb-40">
-                      <span className="tagline">
-                        <i className="fas fa-plus" /> top Funding stories
-                        <span className="heading-shadow-text">Top Stories</span>
-                      </span>
-                      <h2 className="title">Meet William &amp; Michael</h2>
-                    </div>
-                    <p className="mb-30">
-                      Sed ut perspiciatis unde omnis iste natus error sit
-                      voluptatem accusantium doloremque laudantium totam rem
-                      aperiam eaque ipsa quae ab illo inventore veritatis et
-                      quasi architecto beatae vitae dicta sunt explicabo enim
-                      ipsam voluptatem
-                    </p>
-                    <p className="italic-text">
-                      On the other hand, we denounce with righteous indignation
-                      and dislike men who are so beguiled and demoralized
-                    </p>
-                    <Link
-                      to="/company-overview"
-                      className="main-btn bordered-btn mt-40"
-                    >
-                      Learn More <i className="far fa-arrow-right" />
-                    </Link>
-                  </div>
+            <div className="row justify-content-center">
+              {/* LEFT COLUMN */}
+              <div className="col-xl-4 col-lg-5 col-md-9">
+                <div className="conten text-center">
+                  <img
+                    src={img7}
+                    alt="Logo"
+                    className="cta-logo mb-3"
+                    style={{ width: "60px" }}
+                  />
+                  <h2 className="cta-title">Donate</h2>
+                  <p className="">
+                    Your donation supports vital <br /> campaigns worldwide.
+                    Every
+                    <br />
+                    dollar counts.
+                  </p>
+                  <Link to="/" className="main-btn">
+                    Discover Projects <i className="far fa-arrow-right" />
+                  </Link>
                 </div>
               </div>
-              <div className="single-slider">
-                <div className="image-text-block text-block-one">
-                  <div className="block-img">
-                    <img src="assets/img/text-block/01.jpg" alt="Image" />
-                  </div>
-                  <div className="block-content">
-                    <div className="common-heading mb-40">
-                      <span className="tagline">
-                        <i className="fas fa-plus" /> top Funding stories
-                        <span className="heading-shadow-text">Top Stories</span>
-                      </span>
-                      <h2 className="title">Meet William &amp; Michael</h2>
-                    </div>
-                    <p className="mb-30">
-                      Sed ut perspiciatis unde omnis iste natus error sit
-                      voluptatem accusantium doloremque laudantium totam rem
-                      aperiam eaque ipsa quae ab illo inventore veritatis et
-                      quasi architecto beatae vitae dicta sunt explicabo enim
-                      ipsam voluptatem
-                    </p>
-                    <p className="italic-text">
-                      On the other hand, we denounce with righteous indignation
-                      and dislike men who are so beguiled and demoralized
-                    </p>
-                    <Link
-                      to="/company-overview"
-                      className="main-btn bordered-btn mt-40"
-                    >
-                      Learn More <i className="far fa-arrow-right" />
-                    </Link>
-                  </div>
+
+              <div className="col-xl-2 col-lg-1 cta-double-content-gap" />
+
+              {/* RIGHT COLUMN */}
+              <div className="col-xl-4 col-lg-5 col-md-9">
+                <div className="contet text-center">
+                  <img
+                    src={img4}
+                    alt="Logo"
+                    className="cta-logo mb-3"
+                    style={{ width: "60px" }}
+                  />
+                  <h2 className="cta-title">Start A Project</h2>
+                  <p>
+                    {" "}
+                    Nonprofits ready to make
+                    <br /> a difference can start their
+                    <br /> own fundraising campaign here.
+                  </p>
+                  <Link to="/" className="main-btn">
+                    Start a Project <i className="far fa-arrow-right" />
+                  </Link>
                 </div>
               </div>
-            </Slider>
+            </div>
           </div>
         </div>
- 
       </section>
-      {/*====== Counter With Image Text Block End ======*/}
-      {/*====== Testimonials Start ======*/}
-      <section className="testimonials-section section-gap">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-xl-8 col-lg-10">
-              <div className="common-heading text-center mb-30">
-                <span className="tagline">
-                  <i className="fas fa-plus" /> clients Feedback
-                  <span className="heading-shadow-text">Testimonials</span>
-                </span>
-                <h2 className="title">{`What People's Say`}</h2>
+
+      {/* <section className="counter-section-one mt-negative">
+        <div className="container primary-bg">
+          <div className="row counter-boxes justify-content-xl-between justify-content-center">
+            <div className="col-xl-auto col-lg-5 col-md-5 col-sm-6">
+              <div className="counter-box mb-40 icon-left">
+                <div className="icon white-color">
+                  <i className="flaticon-crowdfunding" />
+                </div>
+                <div className="content white-color">
+                  <div className="count-wrap">
+                    <Counter end={3598} />
+                    <span className="suffix">+</span>
+                  </div>
+                  <h6 className="title">We’ve Project Complate</h6>
+                </div>
               </div>
-              <div className="testimonial-boxes">
-                <div
-                  className="testimonial-box-two mt-30 "
-                  data-aos="fade-up"
-                  data-aos-delay="0"
-                >
-                  <div className="author-img">
-                    <img src="assets/img/author-thumbs/07.png" alt="Thumb" />
+            </div>
+            <div className="col-xl-auto col-lg-5 col-md-5 col-sm-6">
+              <div className="counter-box mb-40 icon-left">
+                <div className="icon white-color">
+                  <i className="flaticon-crowdfunding" />
+                </div>
+                <div className="content white-color">
+                  <div className="count-wrap">
+                    <Counter end={9634} />
+                    <span className="suffix">+</span>
                   </div>
-                  <div>
-                    <p className="testimonial-desc">
-                      {`"Sed perspiciat unde omnis iste natus error voluptatem
-                      accusantium dolorem audantium totam aperiam eaque quae
-                      abillo inventore veritatis Quis autem vel eum iure
-                      reprehenderit qui in ea voluptate"`}
+                  <h6 className="title">Global Partners</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-xl-auto col-lg-5 col-md-5 col-sm-6">
+              <div className="counter-box mb-40 icon-left">
+                <div className="icon white-color">
+                  <i className="flaticon-crowdfunding" />
+                </div>
+                <div className="content white-color">
+                  <div className="count-wrap">
+                    <Counter end={8565} />
+                    <span className="suffix">+</span>
+                  </div>
+                  <h6 className="title">Awards Winning</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-xl-auto col-lg-5 col-md-5 col-sm-6">
+              <div className="counter-box mb-40 icon-left">
+                <div className="icon white-color">
+                  <i className="flaticon-crowdfunding" />
+                </div>
+                <div className="content white-color">
+                  <div className="count-wrap">
+                    <Counter end={4756} />
+                    <span className="suffix">+</span>
+                  </div>
+                  <h6 className="title">Active Volunteer</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section> */}
+      {/*====== Counter Area End ======*/}
+      <section className="mb-80 counter-with-image-text-block">
+        <div className="counter-boxes-area primary-soft-bg">
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-lg-3 col-md-6">
+                <div className="counter-box mb-60 text-center h-100 d-flex flex-column">
+                  {" "}
+                  {/* Added h-100 */}
+                  <div className="icon mx-auto">
+                    <img src={tan1} className="fla" alt="Impact First icon" />
+                  </div>
+                  <div className="content flex-grow-1 d-flex flex-column">
+                    {" "}
+                    {/* Added flex classes */}
+                    <span className="d-block title">
+                      Impact <br /> First
+                    </span>
+                    <p className="mx-auto">
+                      {" "}
+                      {/* Added mt-auto */}
+                      Every project is chosen by the communities it serves — so
+                      your donation directly fuels real, local impact.
                     </p>
-                    <div className="author-info">
-                      <h5 className="name">Howard A. Guest</h5>
-                      <p className="position">Web Developer</p>
-                    </div>
-                  </div>
-                  <div className="rating-wrap">
-                    <ul>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                    </ul>
                   </div>
                 </div>
-                <div
-                  className="testimonial-box-two mt-30 "
-                  data-aos="fade-up"
-                  data-aos-delay="100"
-                >
-                  <div className="author-img">
-                    <img src="assets/img/author-thumbs/08.png" alt="Thumb" />
+              </div>
+              <div className="col-lg-3 col-md-6">
+                <div className="counter-box mb-60 text-center h-100 d-flex flex-column">
+                  {" "}
+                  {/* Changed to counter-box */}
+                  <div className="icon mx-auto">
+                    <img src={tans} className="fla jii" alt="Milestone icon" />
                   </div>
-                  <div>
-                    <p className="testimonial-desc">
-                      {`"On the other hands denounce with righteous indignation
-                      and dislike men who are so beguiled and demoralized by the
-                      charms of pleasure of the moment, so blinded by desire,
-                      that they cannot foresee"`}
+                  <div className="content flex-grow-1 d-flex flex-column">
+                    <span className="d-block title">
+                      {" "}
+                      {/* Changed from titl titles */}
+                      Milestone-Based Giving
+                    </span>
+                    <p className="mx-auto ">
+                      Donations are held in smart digital vaults and only
+                      released when verified milestones are met.
                     </p>
-                    <div className="author-info">
-                      <h5 className="name">Randall S. Rosenow</h5>
-                      <p className="position">CEO &amp; Founder</p>
-                    </div>
-                  </div>
-                  <div className="rating-wrap">
-                    <ul>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                    </ul>
                   </div>
                 </div>
-                <div
-                  className="testimonial-box-two mt-30 "
-                  data-aos="fade-up"
-                  data-aos-delay="200"
-                >
-                  <div className="author-img">
-                    <img src="assets/img/author-thumbs/09.png" alt="Thumb" />
+              </div>
+              <div className="col-lg-3 col-md-6">
+                <div className="counter-box mb-60 text-center h-100 d-flex flex-column">
+                  {" "}
+                  {/* Changed to counter-box */}
+                  <div className="icon mx-auto">
+                    <img src={tan2} className="fla jii" alt="Milestone icon" />
                   </div>
-                  <div>
-                    <p className="testimonial-desc">
-                      {`"At vero eoset accusamus et iusto odio dignissimos ducimus
-                      blandit praesentium voluptatum deleniti atque corrupti
-                      quos dolores et quastiy molestias excepturi sint occaecati
-                      cupiditate"`}
+                  <div className="content flex-grow-1 d-flex flex-column">
+                    <span className="d-block title">
+                      {" "}
+                      {/* Changed from titl titles */}
+                      Transparent by Design{" "}
+                    </span>
+                    <p className="mx-auto ">
+                      Every donation is traceable. See where your support goes,
+                      who it helps, and what changes — in real time.
                     </p>
-                    <div className="author-info">
-                      <h5 className="name">Christopher D. Greer</h5>
-                      <p className="position">Senior Manager</p>
-                    </div>
                   </div>
-                  <div className="rating-wrap">
-                    <ul>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                      <li>
-                        <i className="fas fa-star" />
-                      </li>
-                    </ul>
+                </div>
+              </div>
+              <div className="col-lg-3 col-md-6">
+                <div className="counter-box mb-60 text-center h-100 d-flex flex-column">
+                  {" "}
+                  {/* Changed to counter-box */}
+                  <div className="icon mx-auto">
+                    <img src={tan3} className="fla jii" alt="Milestone icon" />
+                  </div>
+                  <div className="content flex-grow-1 d-flex flex-column">
+                    <span className="d-block title">
+                      {" "}
+                      {/* Changed from titl titles */}
+                      Powered by Purposeful Tech
+                    </span>
+                    <p className="mx-auto ">
+                      We use secure, open digital tools like blockchain and
+                      stable digital cash to make giving more accountable,
+                      borderless, and fair.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -696,111 +470,84 @@ const Index2 = () => {
           </div>
         </div>
       </section>
+
       {/*====== Testimonials End ======*/}
-      {/*====== Partners Section With CTA Start ======*/}
-      <section className="partners-with-cta">
-        <div className="cta-boxes">
-          <div className="container">
-            <div className="row no-gutters justify-content-center">
-              <div className="col-lg-6 col-md-10">
-                <div
-                  className="cta-box cta-primary-overly"
-                  style={{ backgroundImage: "url(assets/img/cta/02.jpg)" }}
-                >
-                  <h2 className="cta-title">Start Fundraising?</h2>
-                  <p>
-                    Quis autem vel eum iure reprehenderit quien voluptate velit
-                    esse quam nihil molestiae consequatur illum dolorem
-                  </p>
-                  <Link to="/events" className="main-btn btn-white">
-                    Start a Funden <i className="far fa-arrow-right" />
-                  </Link>
-                </div>
-              </div>
-              <div className="col-lg-6 col-md-10">
-                <div
-                  className="cta-box mt-40"
-                  style={{ backgroundImage: "url(assets/img/cta/03.jpg)" }}
-                >
-                  <h2 className="cta-title">Start Fundraising?</h2>
-                  <p>
-                    Quis autem vel eum iure reprehenderit quien voluptate velit
-                    esse quam nihil molestiae consequatur illum dolorem
-                  </p>
-                  <Link to="/events" className="main-btn">
-                    Start a Funden <i className="far fa-arrow-right" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+      {/*====== Emergency Project & CTA Start ======*/}
+
+      {/*====== Emergency Project & CTA End ======*/}
+      {/*====== Partners Section Start ======*/}
+      {/* <section className="partners-section section-gap section-border-bottom">
+        <div className="container">
+          <div className="common-heading mb-30">
+            <span className="tagline">
+              <i className="fas fa-plus" /> Our Partners
+              <span className="heading-shadow-text">Partners</span>
+            </span>
+            <h2 className="title">Trusted Partners</h2>
           </div>
-        </div>
-        <div className="partners-logos">
-          <div className="container">
-            <div className="row partners-logos-two">
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+          <div className="row partners-logos-one">
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/01.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/02.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/03.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/04.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/05.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/06.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/07.png" alt="Image" />
                   </Link>
-                </div>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-6">
-                <div className="logo mb-30">
-                  <Link to="/testimonial">
+            </div>
+            <div className="col-lg-3 col-md-4 col-sm-6">
+              <div className="logo mt-30">
+                <Link to="/testimonial">
                     <img src="assets/img/partners/08.png" alt="Image" />
                   </Link>
-                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      {/*====== Partners Section With CTA End ======*/}
+      </section> */}
+      {/*====== Partners Section End ======*/}
       {/*====== Latest News Start ======*/}
-      <section className="latest-blog-section section-gap-extra-bottom">
+      {/* <section className="latest-blog-section section-gap">
         <div className="container">
           <div className="common-heading text-center mb-30">
             <span className="tagline">
@@ -809,10 +556,9 @@ const Index2 = () => {
             </span>
             <h2 className="title">Get Every Single Update</h2>
           </div>
-          <div className="row justify-content-center latest-blog-posts style-two">
+          <div className="row justify-content-center latest-blog-posts style-one">
             <div
-              className="col-lg-4 col-md-6 col-sm-9 col-11 "
-              data-aos="fade-up"
+              className="col-lg-4 col-md-6 col-sm-9 col-11 " data-aos="fade-up"
               data-aos-delay="100"
             >
               <div className="latest-post-box mt-30">
@@ -824,19 +570,16 @@ const Index2 = () => {
                     <i className="far fa-calendar-alt" /> 25 February 2021
                   </a>
                   <h6 className="title">
-                    <Link to="/news-details">
-                      Standing Out From Crowds mproving Mobile Experience
-                    </Link>
+                    <Link to="/news-details">Standing Out From Crowds mproving Mobile Experience</Link>
                   </h6>
                   <Link to="/news-details" className="post-link">
-                    Read More <i className="far fa-arrow-right" />
-                  </Link>
+                      Read More <i className="far fa-arrow-right" />
+                    </Link>
                 </div>
               </div>
             </div>
             <div
-              className="col-lg-4 col-md-6 col-sm-9 col-11 "
-              data-aos="fade-up"
+              className="col-lg-4 col-md-6 col-sm-9 col-11 " data-aos="fade-up"
               data-aos-delay="200"
             >
               <div className="latest-post-box mt-30">
@@ -849,19 +592,18 @@ const Index2 = () => {
                   </a>
                   <h6 className="title">
                     <Link to="/news-details">
-                      Five Rules Of App Localization China Money Dating And App
-                      Store
-                    </Link>
+                        Five Rules Of App Localization China Money Dating And
+                        App Store
+                      </Link>
                   </h6>
                   <Link to="/news-details" className="post-link">
-                    Read More <i className="far fa-arrow-right" />
-                  </Link>
+                      Read More <i className="far fa-arrow-right" />
+                    </Link>
                 </div>
               </div>
             </div>
             <div
-              className="col-lg-4 col-md-6 col-sm-9 col-11 "
-              data-aos="fade-up"
+              className="col-lg-4 col-md-6 col-sm-9 col-11 " data-aos="fade-up"
               data-aos-delay="300"
             >
               <div className="latest-post-box mt-30">
@@ -873,23 +615,19 @@ const Index2 = () => {
                     <i className="far fa-calendar-alt" /> 25 February 2021
                   </a>
                   <h6 className="title">
-                    <Link to="/news-details">
-                      How To Use Underlined Text Improve User Experience
-                    </Link>
+                    <Link to="/news-details">How To Use Underlined Text Improve User Experience</Link>
                   </h6>
                   <Link to="/news-details" className="post-link">
-                    Read More <i className="far fa-arrow-right" />
-                  </Link>
+                      Read More <i className="far fa-arrow-right" />
+                    </Link>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      {/*====== Latest News End ======*/}
-      {/*====== Footer Start ======*/}
+      </section> */}
     </Layout>
   );
 };
 
-export default Index2;
+export default Index;
