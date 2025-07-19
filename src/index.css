@@ -247,7 +247,7 @@ h5,
 
 .impact-list li:before {
   content: "✓";
-  color: #4CAF50;
+  color: #4caf50;
   position: absolute;
   left: 0;
   font-weight: bold;
@@ -290,7 +290,7 @@ h5,
 }
 
 .faq-item h4:hover {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .faq-item p {
@@ -315,7 +315,7 @@ h5,
 }
 
 .faq-footer a {
-  color: #4CAF50;
+  color: #4caf50;
   text-decoration: none;
   transition: all 0.3s ease;
 }
@@ -329,16 +329,16 @@ h5,
   .section-title {
     font-size: 28px;
   }
-  
+
   .section-subtitle {
     font-size: 18px;
   }
-  
+
   .impact-content,
   .features-section {
     padding: 20px;
   }
-  
+
   .faq-item h4 {
     font-size: 18px;
   }
@@ -349,7 +349,7 @@ h5,
   .faq-section {
     padding: 60px 0;
   }
-  
+
   .section-title {
     font-size: 24px;
   }

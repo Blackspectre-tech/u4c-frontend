@@ -4,6 +4,7 @@ import Home2 from "./pages/index-2";
 import NewsStandard from "./pages/news-standard";
 import Project1 from "./pages/project-1";
 import ProjectDetails from "./pages/project-details";
+import Dashboard from "./pages/Dashboard";
 
 import Terms from "./pages/tandcs";
 import PrivacyPolicy from "./pages/privacy";
@@ -12,6 +13,7 @@ import PasswordResetSuccess from "./pages/password";
 const routes = [
   { path: "/", Component: Home2 },
   { path: "/about", Component: About },
+  { path: "/dashboard", Component: Dashboard },
   //   { path: "/forgot-password", Component: ForgotPassword },
   // { path: "/login", Component: Login },
   { path: "/cvp", Component: NewsStandard },

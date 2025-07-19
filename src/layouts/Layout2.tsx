@@ -1,12 +1,20 @@
-// src/layouts/Layout.jsx
-import { useEffect } from "react";
+// src/layouts/Layout2.tsx
+import { useEffect, ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { activeNavMenu, animation, aTagClick, dataPoggress } from "../utils";
 import Footer from "./Footer";
-import Header from "./Header";
+import Header2 from "./Header2";
 import MobileHeader from "./MobileHeader";
 import CookieConsent from "../pages/cookieconsent";
 import ScrollToTop from "../pages/ScrollToTop";
+
+interface Layout2Props {
+  children: ReactNode;
+  transparentTop?: boolean;
+  transparentHeader?: boolean;
+  topSecondaryBg?: boolean;
+  footerSolidBg?: boolean;
+}
 
 const Layout = ({
   children,
@@ -14,7 +22,7 @@ const Layout = ({
   transparentHeader,
   topSecondaryBg,
   footerSolidBg,
-}) => {
+}: Layout2Props) => {
   const location = useLocation();
 
   useEffect(() => {
@@ -27,7 +35,7 @@ const Layout = ({
   return (
     <>
       <ScrollToTop />
-      <Header
+      <Header2
         transparentTop={transparentTop}
         transparentHeader={transparentHeader}
         topSecondaryBg={topSecondaryBg}

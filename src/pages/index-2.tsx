@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import Counter from "../components//Counter";
 import Layout from "../layouts/Layout";
+import PrimaryButton from "../components/PrimaryButton";
 import { projectSliderOne, projectSliderTwo } from "../sliderProps";
 import { useEffect } from "react";
 import bg1 from "../assets/img/U4C4.png";

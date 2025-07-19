@@ -1,6 +1,6 @@
 import { createAppKit } from "@reown/appkit/react";
 import { injected } from "wagmi/connectors";
-
+import { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import { arbitrum, holesky, mainnet, sepolia } from "@reown/appkit/networks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -39,7 +39,11 @@ createAppKit({
   },
 });
 
-export function AppKitProvider({ children }) {
+interface AppKitProviderProps {
+  children: ReactNode;
+}
+
+export function AppKitProvider({ children }: AppKitProviderProps) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

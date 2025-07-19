@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast";
 import Preloader from "./layouts/Preloader";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import routes from "./routes.jsx";
+import routes from "./routes.tsx";
 
 const App = () => {
   const [preloader, setPreloader] = useState(true);

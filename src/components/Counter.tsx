@@ -1,7 +1,13 @@
+import React from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
 
-const Counter = ({ end = 100, decimals = 0 }) => {
+interface CounterProps {
+  end?: number;
+  decimals?: number;
+}
+
+const Counter: React.FC<CounterProps> = ({ end = 100, decimals = 0 }) => {
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 1,
