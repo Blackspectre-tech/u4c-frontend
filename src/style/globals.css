@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+/* @import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css"; */
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --w3m-font-family: system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+.swiper-wrapper {
+  transition-timing-function: linear !important;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body {
+  background-color: #fcfcfc;
+}
+
+#gradient-txt {
+  background-image: linear-gradient(
+    to right,
+    #812880,
+    #eb2027,
+    #f26e24,
+    #f4901e
+  );
+  -webkit-background-clip: text; /* Safari/Chrome */
+  background-clip: text; /* Standard */
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback for other browsers */
+}
+
+#gradient-border {
+  /* make room for the “border” */
+  border: 2px solid transparent;
+
+  /* inner fill + outer gradient border */
+  background: linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(to right, #812880, #eb2027, #f26e24, #f4901e, #33b2ba)
+      border-box;
+
+  /* helps clip any tiny artifacts on some browsers */
+  /* overflow: hidden; */
+  /* optional: ensure correct clipping model */
+  background-clip: padding-box, border-box;
+}
+
+#gradient-button {
+  background-image: linear-gradient(to right, #812880, #eb2027);
+  border: none;
+  font-size: 1rem;
+  color: white; /* Text color on top of gradient */
+  border-radius: 8px;
+  cursor: pointer;
+  background-size: 100% auto;
+  transition: background-position 0.3s ease;
+}
+
+.scroll_effect_child_ {
+  transform: translateY(3rem);
+}
+
+.heading_ {
+  @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[3rem] lg:leading-[3.9rem];
+}
+
+.button_ {
+  @apply bg-gradient-to-r from-[#812880] to-[#eb2027] to-60% rounded-lg text-white;
+}
+
+.button_border_ {
+  @apply font-bold cursor-pointer border-[1px] border-transparent [background:linear-gradient(#fcfcfc,#fcfcfc)_padding-box,linear-gradient(90deg,#812880,#eb2027)_border-box];
+}
+
+/* --------------------------------------------------------------------- */
+/* -------------------------------------------- */
+.loading_ {
+  overflow: hidden;
+}
+.loading_::before {
+  content: "";
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.9),
+    transparent
+  );
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  -webkit-animation: loading var(--duration, 1.5s) infinite;
+  animation: loading var(--duration, 1.5s) infinite;
+
+  -webkit-animation-delay: var(--delay, 0s);
+  animation-delay: var(--delay, 0s);
+}
+
+@-webkit-keyframes loading {
+  0% {
+    transform: skewX(-10deg) translateX(-100%);
+  }
+  100% {
+    transform: skewX(-10deg) translateX(200%);
+  }
+}
+
+@keyframes loading {
+  0% {
+    transform: skewX(-10deg) translateX(-100%);
+  }
+  100% {
+    transform: skewX(-10deg) translateX(200%);
+  }
+}
+
+/* -------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* -------------------------------------------- */
+
+.button_loading_ {
+  position: relative;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation-name: loading-spinner-animation;
+  animation-name: loading-spinner-animation;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-duration: 0.8s;
+  animation-duration: 0.8s;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+}
+@keyframes loading-spinner-animation {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+/* -------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+#wallet:hover #wallet-child {
+  @apply pointer-events-auto opacity-100 translate-y-[0rem];
+}
+#wallet-child:hover {
+  @apply pointer-events-auto opacity-100 translate-y-[0rem];
+}
+
+.ripple {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.ripple-circle {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #33b2ba;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 2s ease-out infinite;
+}
+
+.ripple-circle:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.ripple-circle:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------- */
+/* --------------------------------------------------------------------- */
+.noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, #000 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, #000 0 1px, transparent 1px 4px);
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
