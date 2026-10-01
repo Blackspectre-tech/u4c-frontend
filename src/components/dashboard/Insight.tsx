@@ -1,28 +1,48 @@
 import React from "react";
 import { FaPhoneFlip } from "react-icons/fa6";
+import { format_currency } from "../utilities/utils";
 
 function Insight({
-  value = "$4000",
-  description = "Lorem ipsum dolor.",
-  icon = <FaPhoneFlip />,
+  surplus = 0,
+  status = null,
+  value,
+  description,
+  colorTint,
+  icon,
 }: {
-  value?: string;
-  description?: string;
-  icon?: any;
+  status?: boolean | null;
+  surplus?: number;
+  value: string | number;
+  description: string;
+  colorTint: string;
+  icon: any;
 }) {
   return (
-    <div id="gradient-border" className="rounded-lg overflow-hidden">
-      <div className="h-full bg-[#fcfcfc] p-4">
+    <div className="h-full p-4">
+      {!status ? (
         <div className="flex items-center gap-3">
-          <div className="bg-[#812880] rounded-lg text-white px-3 py-3 text-[1.2rem]">
+          <h1 className="font-semibold text-3xl sm:text-4xl mb-1">
+            {format_currency(Number(value || 0) + Number(surplus || 0))}
+          </h1>
+
+          <div
+            className={`rounded-full text-white px-3 py-3 text-[1.0rem] sm:text-[1.2rem] ${colorTint}`}
+          >
             {icon}
           </div>
-
-          <h1 className="font-semibold text-2xl mb-1">{value}</h1>
         </div>
+      ) : (
+        <div className="flex items-center gap-3">
+          <div
+            className={`rounded-full flex items-center gap-3 px-5 py-3 text-[1.0rem] sm:text-[1.2rem] ${colorTint}`}
+          >
+            <h1 className="font-semibold text-xl mb-1">{value}</h1>
+            {icon}
+          </div>
+        </div>
+      )}
 
-        <p className="mt-2">{description}</p>
-      </div>
+      <p className="mt-2">{description}</p>
     </div>
   );
 }

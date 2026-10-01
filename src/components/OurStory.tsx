@@ -1,83 +1,81 @@
 "use client";
 
-import Image from "next/image";
-import gsap from "gsap";
-import React, { useEffect, useRef } from "react";
-import { FaCircleCheck } from "react-icons/fa6";
+import { FaCircleCheck, FaQuoteLeft } from "react-icons/fa6";
+import { MdOutlineHourglassEmpty, MdVerifiedUser } from "react-icons/md";
 
-function FundProject({ description = "" }: { description: string }) {
-  const ref_container = useRef<HTMLDivElement | null>(null);
-  const ref_slide_in = useRef<HTMLDivElement | null>(null);
+const checks = ["NGO Registration Certificate", "Identity Verification"];
 
-  useEffect(() => {
-    const gsap_video = gsap.context((context) => {});
-    gsap_video.add("init_animation", () => {
-      console.log("====================================");
-      console.log(ref_container.current);
-      console.log(ref_slide_in.current);
-      console.log("====================================");
-
-      gsap.to(ref_slide_in.current, {
-        width: "100%",
-        // x: 0,
-        // duration: 1,
-
-        scrollTrigger: {
-          id: `ref_video`,
-          trigger: ref_container.current,
-          start: "clamp(top top+=100%)",
-          endTrigger: ref_container.current,
-          end: "clamp(bottom bottom-=50%)",
-          scrub: 1,
-          // markers: true,
-        },
-      });
-    });
-
-    gsap_video.init_animation();
-
-    return () => {
-      gsap_video.revert();
-    };
-  }, []);
-
+function OurStory({
+  description = "",
+  verified = false,
+}: {
+  description?: string;
+  verified?: boolean;
+}) {
   return (
-    <div ref={ref_container} className="relative p-5 sm:p-10 lg:p-20 mt-[5rem]">
-      <div
-        ref={ref_slide_in}
-        className="absolute top-0 left-0 w-[20%] h-full bg-[#F2F8F9]"
-      ></div>
-
-      <div className="relative z-[1]">
-        <h1 className="font-semibold text-center text-3xl mb-3">Ngo Details</h1>
-
-        <div className="w-full flex flex-col min-[900]:grid grid-cols-2 gap-7 lg:gap-14 min-[700]:px-20 min-[900]:px-0 xl:px-30 mt-[5rem]">
-          <div className="flex flex-col justify-center">
-            <h1 className="text-3xl font-bold my-5">
+    <div className="relative p-5 sm:p-10 lg:p-20 mt-20 bg-primary/13">
+      <div className="relative z-1">
+        <div className="w-full flex flex-col lg:grid lg:grid-cols-5 gap-7 lg:gap-14 xl:px-30">
+          <div className="lg:col-span-3 flex flex-col justify-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-gray-500">
+              About us
+            </p>
+            <h1 className="text-4xl font-bold mt-2 mb-6">
               Our <span id="gradient-txt">Story</span>
             </h1>
-            <p>{description}</p>
+
+            <div className="rounded-3xl bg-white/70 border border-white shadow-sm p-6 sm:p-8">
+              <FaQuoteLeft className="text-[2rem] text-[#f4901e]/40 mb-4" />
+
+              <p
+                className={`text-lg leading-relaxed whitespace-pre-line ${description ? "text-gray-800" : "text-gray-400"}`}
+              >
+                {description ||
+                  "This organization hasn't shared its story yet."}
+              </p>
+            </div>
           </div>
 
-          <div className="bg-white rounded-lg border-2 border-gray-400/10 p-5 lg:p-10">
-            <h1 className="text-3xl font-bold my-5">
-              Compliance & Verification
-            </h1>
-
-            <div className="flex flex-col gap-5 mt-5 pl-5">
-              <div className="flex items-center">
-                <div className="w-10 h-10 flex items-center">
-                  <FaCircleCheck className="text-[1.8rem] text-[#33b2ba]" />
-                </div>
-                <p>NGO Registration Certificate</p>
+          <div className="lg:col-span-2 self-center rounded-3xl bg-white border border-gray-200 shadow-sm p-6 sm:p-8">
+            <div className="flex items-center gap-4">
+              <div className="gradient-cto-two w-12 h-12 min-w-12 rounded-2xl flex items-center justify-center">
+                <MdVerifiedUser className="text-[1.5rem] text-white" />
               </div>
 
-              <div className="flex items-center">
-                <div className="w-10 h-10 flex items-center">
-                  <FaCircleCheck className="text-[1.8rem] text-[#33b2ba]" />
-                </div>
-                <p>Identity Verification</p>
+              <div>
+                <h2 className="text-2xl font-bold leading-tight">
+                  Compliance & Verification
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {verified ? "All checks completed" : "Verification pending"}
+                </p>
               </div>
+            </div>
+
+            <div className="flex flex-col gap-3 mt-6">
+              {checks.map((check) => (
+                <div
+                  key={check}
+                  className={`flex items-center gap-4 rounded-2xl border p-4 ${
+                    verified
+                      ? "border-[#33b2ba]/25 bg-[#33b2ba]/5"
+                      : "border-gray-200 bg-gray-50"
+                  }`}
+                >
+                  {verified ? (
+                    <FaCircleCheck className="text-[1.6rem] min-w-6 text-[#33b2ba]" />
+                  ) : (
+                    <MdOutlineHourglassEmpty className="text-[1.6rem] min-w-6 text-gray-400" />
+                  )}
+
+                  <div>
+                    <p className="font-semibold">{check}</p>
+                    <p className="text-sm text-gray-500">
+                      {verified ? "Verified" : "Pending review"}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -86,4 +84,4 @@ function FundProject({ description = "" }: { description: string }) {
   );
 }
 
-export default FundProject;
+export default OurStory;

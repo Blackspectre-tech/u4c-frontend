@@ -40,8 +40,8 @@ function HowItWorks() {
   const count = { value: 0 };
 
   return (
-    <div className="mt-[5rem] text-center">
-      <div className="w-full flex flex-col items-center gap-10 md:gap-20 mt-[5rem]  px-5 sm:px-20">
+    <div className="mt-20 text-center">
+      <div className="w-full flex flex-col items-center gap-10 md:gap-20 mt-20  px-5 sm:px-20">
         {how_it_works.map((step, index) => {
           if (count.value === 1) count.value = 0;
           else if (count.value === 0) count.value = 1;
@@ -49,18 +49,18 @@ function HowItWorks() {
           return (
             <div
               key={index}
-              className={`relative bg-gradient-to-br from-[#eb2027]/10 to-[#812880]/5 rounded-xl`}
+              className={`relative bg-linear-to-br from-[#eb2027]/10 to-[#812880]/5 rounded-xl`}
             >
-              <div className="relative z-[1] flex flex-col lg:flex-row justify-center items-center gap-10 p-5 sm:p-14">
+              <div className="relative z-1 flex flex-col lg:flex-row justify-center items-center gap-10 p-5 sm:p-14">
                 <Image
                   src={step.icon}
                   alt=""
                   width={400}
                   height={400}
-                  className="w-[17rem] lg:w-[23rem] rounded-2xl"
+                  className="w-68 lg:w-92 rounded-2xl"
                 />
 
-                <div className="md:w-[90%] lg:w-[40rem] text-center lg:text-left">
+                <div className="md:w-[90%] lg:w-160 text-center lg:text-left">
                   {/* <div className="flex justify-center lg:justify-start mb-3">
                     <div
                       id="gradient-border"
@@ -70,7 +70,7 @@ function HowItWorks() {
                     </div>
                   </div> */}
 
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl leading-[2.0rem] lg:leading-[2.9rem] font-semibold mb-3">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl leading-8 lg:leading-[2.9rem] font-semibold mb-3">
                     {step.heading}
                   </h1>
                   <p>{step.paragraph}</p>

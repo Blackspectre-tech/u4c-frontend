@@ -1,37 +1,13 @@
 "use client";
 
-import BackButton from "@/components/dashboard/BackButton";
-import Campaign_DONOR from "@/components/dashboard/donor/Campaign";
-import Campaign_NGO from "@/components/dashboard/ngo/Campaign";
-import LocationMap from "@/components/LocationMap";
-import {
-  format_date,
-  get_time_ago,
-  response_message,
-} from "@/components/utilities/utils";
-import {
-  useGetCampaignNgoMutation,
-  useGetCommentMutation,
-} from "@/redux/api/main";
+import { get_time_ago, response_message } from "@/components/utilities/utils";
+import { NavigationTemplate } from "@/components/utilities/utils.template";
 import { RootState } from "@/redux/store";
-import { Get_Transaction_Details } from "@/Wallet/ConnectContract";
-import { error } from "console";
-import Image from "next/image";
+import { Get_Transaction_Details } from "@/Wallet/privy/privy.utils";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaCopy } from "react-icons/fa";
-import { GiTrophy } from "react-icons/gi";
-import { GoLink } from "react-icons/go";
-import { IoPeople } from "react-icons/io5";
 import { LuExternalLink } from "react-icons/lu";
-import {
-  MdCancel,
-  MdDateRange,
-  MdOutlineKeyboardDoubleArrowLeft,
-} from "react-icons/md";
-import { PiEmptyBold } from "react-icons/pi";
-import { TbPercentage75, TbPlus } from "react-icons/tb";
 import { useSelector } from "react-redux";
 
 export default function Home() {
@@ -41,15 +17,15 @@ export default function Home() {
   const router = useRouter();
   const params = useSearchParams();
   const harsh = params.get("harsh");
-  const data = params.get("data");
+  const date = params.get("date");
   const event = params.get("event");
 
   useEffect(() => {
     console.log("====================================");
-    console.log(harsh, " : ", data);
+    console.log(harsh, " : ", date);
     console.log("====================================");
 
-    if (!harsh || !data || !event) return router.back();
+    if (!harsh || !date || !event) return router.back();
 
     (async () => {
       // Example usage
@@ -144,17 +120,24 @@ export default function Home() {
 
   return (
     <div className="px-5 md:px-10">
-      <BackButton route="/dashboard/transactions" />
+      <NavigationTemplate
+        title="Transaction Details"
+        navigation={[
+          { title: "Dashboard", path: "/dashboard" },
+          { title: "Transaction History", path: "/dashboard/transactions" },
+          { title: "Transaction Details", path: "#" },
+        ]}
+      />
 
-      <div className="rounded-lg w-full relative border-[2px] border-transparent">
-        <div className="w-full h-full col-span-6 xl:col-span-7 overflow-hidden object-center bg-[url('https://images.unsplash.com/photo-1740568439252-b060d7ff3437?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Ds')] rounded-lg">
-          <div className="w-full bg-[linear-gradient(90deg,#812880a1,#eb2027e1)] p-7 md:p-10">
+      <div className="rounded-lg w-full relative border-2 border-transparent mt-5">
+        <div className="w-full h-full col-span-6 xl:col-span-7 overflow-hidden object-center bg-[url('https://images.unsplash.com/photo-1740568439252-b060d7ff3437?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Ds')] rounded-4xl">
+          <div className="w-full bg-[linear-gradient(90deg,#eb2027e1,#f36f26e1)] p-7 md:p-10">
             <h1 className="text-white text-2xl md:text-3xl lg:text-4xl font-semibold">
               Transaction Details{" "}
-              <span className="px-2 py-1 text-[0.8rem] bg-[#48f3ff] text-[#144447] border-1 border-[#48f3ff] rounded-lg">
-                {event === "null" ? "..." : event}
-              </span>
             </h1>
+            <h2 className="text-white text-[1.2rem] px-2 py-1">
+              {event === "null" ? "..." : event}
+            </h2>
           </div>
         </div>
 
@@ -176,7 +159,7 @@ export default function Home() {
             >
               <p className="font-semibold mb-3 md:mb-0">{value?.title}</p>
               {value?.address === true ? (
-                <p className="sm:w-[40%] lg:w-[20%] line-clamp-1 wrap-anywhere capitalize ml-2 md:ml-0">
+                <p className="sm:w-[40%] lg:w-[20%] text-right line-clamp-1 wrap-anywhere capitalize ml-2 md:ml-0">
                   {value?.result}
                 </p>
               ) : (

@@ -22,6 +22,34 @@ type CampaignResponse = CampaignResponseSuccess | CampaignResponseError;
 
 export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
   return {
+    // ---------------------------------------------- [ get-profile ]
+    getProfile: builder.mutation<
+      CampaignResponse, // ✅ response type
+      { params?: Record<string, any> } | void // ✅ argument type
+    >({
+      query: ({ params = {} }: { params?: Record<string, any> }) => ({
+        url: "/account/my-profile/",
+        method: "GET",
+        params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
+      }),
+
+      // onQueryStarted is useful for optimistic updates
+      // The 2nd parameter is the destructured `MutationLifecycleApi`
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          await queryFulfilled;
+        } catch (err: any) {
+          console.log(err);
+
+          if (err?.error?.data === "Axios Error") dispatch(setDefault({}));
+        }
+      },
+    }),
+
     // ---------------------------------------------- [ get-popular-campaign ]
     getCampaign: builder.query<
       CampaignResponse, // ✅ response type
@@ -31,6 +59,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/projects/my-projects/",
         method: "GET",
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -54,6 +86,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/projects/my-projects/",
         method: "GET",
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -86,6 +122,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/account/add-wallet/",
         method: "PATCH",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -118,6 +158,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/account/update-userprofile/",
         method: "PATCH",
         body: body,
+        extraData: {
+          useMultipart: true,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -150,6 +194,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/account/upload-avatar/",
         method: "PATCH",
         body: body,
+        extraData: {
+          useMultipart: true,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -185,6 +233,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects${query}donate/`,
         method: "POST",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -220,6 +272,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/account/transactions/add/`,
         method: "POST",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -255,6 +311,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects${query}comments/add/`,
         method: "POST",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -290,6 +350,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects/comments${query}`,
         method: "GET",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -325,6 +389,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects/comments${query}`,
         method: "PATCH",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -360,6 +428,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects/comments${query}`,
         method: "DELETE",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -392,6 +464,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/account/transactions/`,
         method: "GET",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates
@@ -427,6 +503,10 @@ export const private_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects/milestones${query}`,
         method: "GET",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: true,
+        },
       }),
 
       // onQueryStarted is useful for optimistic updates

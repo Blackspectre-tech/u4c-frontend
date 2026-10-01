@@ -67,10 +67,7 @@ export default function Home() {
         </div>
 
         <div className="col-span-6 relative z-10 p-3 sm:p-5">
-          <div
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] p-4 sm:p-7"
-          >
+          <div className="gradient-cto-border rounded-[1rem] border border-transparent bg-[#fcfcfc] p-4 sm:p-7">
             <div className="flex flex-col gap-5">
               <label
                 sign-up-path="/sign-up/donor"
@@ -78,8 +75,8 @@ export default function Home() {
                 onClick={select_type}
                 className={`${
                   signUpType.type === "donor"
-                    ? "bg-[#33b1ba79]/30 border-2 border-[#33b1baa2]/40 text-black"
-                    : "bg-[#33b1ba79]/5 border-2 border-[#33b1baa2]/7 text-gray-600"
+                    ? "bg-primary/5 border-2 border-primary/40 text-black"
+                    : "bg-[#fafafa] border-2 border-[#e9e9e9]/60 text-gray-600"
                 } flex flex-col sm:flex-row items-center gap-5 rounded-lg cursor-pointer p-5`}
               >
                 <div className="bg-[#33b2ba] w-20 h-20 min-w-20 min-h-20 rounded-lg flex justify-center items-center text-[3rem] text-white">
@@ -89,8 +86,9 @@ export default function Home() {
                 <div className="text-center sm:text-left">
                   <p className="text-xl font-semibold">Donor</p>
                   <p className="text-sm font-semibold mt-2">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Eum, id!
+                    Create a donor account to support verified causes, track
+                    every contribution on-chain, and see exactly how and when
+                    your funds are used from donation to impact.
                   </p>
                 </div>
               </label>
@@ -101,8 +99,8 @@ export default function Home() {
                 onClick={select_type}
                 className={`${
                   signUpType.type === "ngo"
-                    ? "bg-[#33b1ba79]/30 border-2 border-[#33b1baa2]/40 text-black"
-                    : "bg-[#33b1ba79]/5 border-2 border-[#33b1baa2]/7 text-gray-600"
+                    ? "bg-primary/5 border-2 border-primary/40 text-black"
+                    : "bg-[#fafafa] border-2 border-[#e9e9e9]/60 text-gray-600"
                 } flex flex-col sm:flex-row items-center gap-5 rounded-lg cursor-pointer p-5`}
               >
                 <div className="bg-[#33b2ba] w-20 h-20 min-w-20 min-h-20 rounded-lg flex justify-center items-center text-[3rem] text-white">
@@ -113,8 +111,10 @@ export default function Home() {
                 <div className="text-center sm:text-left">
                   <p className="text-xl font-semibold">NGO</p>
                   <p className="text-sm font-semibold mt-2">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Eum, id!
+                    Register your organization to launch transparent fundraising
+                    campaigns, receive milestone-based payouts enforced by smart
+                    contracts, and build donor trust through verifiable
+                    reporting.
                   </p>
                 </div>
               </label>
@@ -134,9 +134,9 @@ export default function Home() {
                     option: "wrn",
                   });
               }}
-              className={`button_ w-full font-semibold rounded-lg cursor-pointer flex items-center justify-center gap-2 mt-7 py-3`}
+              className={`gradient-cto w-full font-semibold rounded-xl cursor-pointer flex items-center justify-center gap-2 mt-7 py-3`}
             >
-              Next
+              Get Started
             </button>
           </div>
         </div>

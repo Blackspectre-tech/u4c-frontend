@@ -5,10 +5,12 @@ import {
 } from "react-icons/pi";
 
 export default function Faq({
+  class_ = "w-full h-full bg-gray-100 hover:bg-gray-50 rounded-2xl border-2 border-gray-300/40 py-5 px-10",
   heading,
   paragraph,
   index,
 }: {
+  class_?: string;
   heading: string;
   paragraph: string;
   index: number;
@@ -18,7 +20,7 @@ export default function Faq({
 
   return (
     <div className={`rounded-lg relative`}>
-      <div className="w-full h-full bg-[#fcfcfc] hover:bg-gray-50 rounded-lg border-2 border-gray-400/10 p-5">
+      <div className={class_}>
         <div
           onClick={() =>
             setOpen((prev) => {
@@ -35,7 +37,7 @@ export default function Faq({
           className="w-full cursor-pointer flex justify-between text-center"
         >
           <h1 className="font-semibold text-left text-lg">{heading}</h1>
-          <div className="w-[2rem] h-[2rem] flex justify-center items-center text-[1.8rem] bg-amber-10">
+          <div className="w-8 h-8 flex justify-center items-center text-[1.8rem] bg-amber-10">
             {open.faq_index === index && open.open === true ? (
               <PiArrowElbowRightUpFill />
             ) : (
@@ -49,7 +51,7 @@ export default function Faq({
             open.faq_index === index && open.open === true
               ? "mt-5"
               : "h-0 overflow-hidden"
-          } transition-all duration-[0.5s]`}
+          } transition-all duration-500`}
         >
           <div className="relative rounded-lg">
             <div className="absolute top-[50%] left-[50%] w-[calc(100%+4px)] h-[calc(100%+4px)] translate-[-50%]"></div>

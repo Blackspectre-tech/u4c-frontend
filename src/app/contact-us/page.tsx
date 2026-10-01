@@ -1,23 +1,12 @@
 "use client";
 
 import CustomSelector from "@/components/SelectTag";
-import { post_jwt, response_message } from "@/components/utilities/utils";
-import {
-  useContactUsMutation,
-  useGetProfileMutation,
-  useSignInMutation,
-} from "@/redux/api/main";
-import {
-  setOnline,
-  setOrganization,
-  setUser,
-  setVerifyEmail,
-} from "@/redux/slice/users";
-import Link from "next/link";
+import { response_message } from "@/components/utilities/utils";
+import { useContactUsMutation } from "@/redux/api/main";
+import { setVerifyEmail } from "@/redux/slice/users";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { TbExternalLink } from "react-icons/tb";
 import { PhoneInput } from "react-international-phone";
 import { useDispatch } from "react-redux";
 import "react-international-phone/style.css";
@@ -47,7 +36,7 @@ export default function Home() {
   const editFormData = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     setFormData((priv) => ({ ...priv, [e.target.name]: e.target.value }));
   };
@@ -79,6 +68,14 @@ export default function Home() {
 
     const result = await Contact_Us({ params: {}, body: formData });
     if (is_error(result) === true) return;
+    setFormData({
+      full_name: "",
+      email: "",
+      phone: "",
+      organization: "",
+      inquiry_type: "General Question",
+      message: "",
+    });
 
     response_message({
       message: "Email Sent successfully",
@@ -92,16 +89,16 @@ export default function Home() {
   console.log("====================================");
 
   return (
-    <div className="mt-[5rem] flex justify-center items-center">
+    <div className="mt-20 flex justify-center items-center">
       <div className="lg:w-[85%] px-5 sm:px-10 md:px-20">
         <div className="relative w-full h-full flex flex-col justify-between text-whit p-7 sm:p-10">
           <div
             // id="gradient-border"
-            className="absolute top-0 left-0 w-full h-[150%] rounded-b-lg bg-[#33b1ba1c]/10 border-2 border-[#33b1baa2]/30 rounded-md"
+            className="absolute top-0 left-0 w-full h-[150%] bg-[#33b1ba1c]/10 border-2 border-[#33b1baa2]/30 rounded-4xl"
           ></div>
 
           <div className="">
-            <h1 className="text-3xl font-bold relative z-10">Contact-Us</h1>
+            <h1 className="text-3xl font-bold relative z-10">Contact Us</h1>
             <p className="relative z-10 mt-5">
               We built United4Change to solve the trust problem in charity, by
               using technology that proves every donation does what it says it
@@ -110,11 +107,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 p-3 sm:p-5">
+        <div className="relative z-10 p-3 sm:p-10">
           <form
             onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] p-4 sm:p-7"
+            className="bg-[#fcfcfc] gradient-cto-border border border-transparent rounded-4xl p-4 sm:p-7"
           >
             <div className="flex flex-col gap-5 px-2">
               <label>
@@ -223,6 +219,7 @@ export default function Home() {
                   optionsList={[
                     "General question",
                     "Technical Support",
+                    "Book a demo",
                     "NGO Partnership",
                     "Donor Support",
                     "Media/Press",
@@ -235,7 +232,7 @@ export default function Home() {
                       inquiry_type: String(selected?.value ?? ""),
                     }))
                   }
-                  mapOption={(val) => ({
+                  mapOption={(val: any) => ({
                     value: val,
                     name: val,
                     label: (
@@ -302,14 +299,14 @@ export default function Home() {
                   value={formData.message}
                   onChange={editFormData}
                   // placeholder="**********"
-                  className="w-full h-[7rem] border border-black/15 outline-0 rounded-md resize-none mt-3 px-5 py-2"
+                  className="w-full h-28 border border-black/15 outline-0 rounded-md resize-none mt-3 px-5 py-2"
                 />
               </label>
             </div>
 
             <button
               disabled={isLoading}
-              className="w-full font-semibold button_ cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
+              className="w-full font-semibold gradient-cto rounded-4xl cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
             >
               {isLoading && (
                 <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />

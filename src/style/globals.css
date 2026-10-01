@@ -10,6 +10,8 @@
 }
 
 @theme inline {
+  --color-primary: #f36f26;
+  --color-primary-shade: #df6422;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -23,6 +25,25 @@
   }
 }
 
+/* -------------------------------------------------_ */
+/* Force Privy modal inputs to be interactive on mobile */
+[data-privy-modal] input,
+[data-privy-modal] button {
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Fix for iOS PWA status bar overlapping the modal close button/search */
+:root {
+  --sat: env(safe-area-inset-top);
+}
+
+[data-privy-modal] {
+  padding-top: var(--sat) !important;
+}
+/* -------------------------------------------------_ */
+
 .swiper-wrapper {
   transition-timing-function: linear !important;
 }
@@ -33,7 +54,50 @@ canvas {
 }
 
 body {
-  background-color: #fcfcfc;
+  /* background-color: #fcfcfc; */
+  background-color: #ffffff;
+}
+
+#dashboard-navigation {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-right: solid 1px #d4d4d47e;
+  background-color: white;
+  z-index: 200;
+  top: 0;
+  left: 0;
+}
+#dashboard-navigation-title {
+  display: none;
+}
+#dashboard-navigation-logo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#dashboard-navigation-logo-0 {
+  display: none;
+}
+#dashboard-navigation-logo-1 {
+  display: block;
+}
+#dashboard-navigation:hover {
+  width: 15rem;
+}
+#dashboard-navigation:hover #dashboard-navigation-title {
+  display: block;
+}
+/* #dashboard-navigation:hover #dashboard-navigation-logo {
+  display: block;
+} */
+#dashboard-navigation:hover #dashboard-navigation-logo-0 {
+  display: block;
+}
+#dashboard-navigation:hover #dashboard-navigation-logo-1 {
+  display: none;
 }
 
 #gradient-txt {
@@ -55,13 +119,10 @@ body {
   border: 2px solid transparent;
 
   /* inner fill + outer gradient border */
-  background: linear-gradient(#fff, #fff) padding-box,
+  background:
+    linear-gradient(#fff, #fff) padding-box,
     linear-gradient(to right, #812880, #eb2027, #f26e24, #f4901e, #33b2ba)
       border-box;
-
-  /* helps clip any tiny artifacts on some browsers */
-  /* overflow: hidden; */
-  /* optional: ensure correct clipping model */
   background-clip: padding-box, border-box;
 }
 
@@ -76,20 +137,119 @@ body {
   transition: background-position 0.3s ease;
 }
 
+.gradient-cto-border {
+  /* make room for the “border” */
+  /* border: 2px solid transparent; */
+
+  /* inner fill + outer gradient border */
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(to right, #e9262a, #f36f26) border-box;
+  background-clip: padding-box, border-box;
+}
+
+.gradient-cto-two {
+  background-image: linear-gradient(to right, #e9262a, #f36f26);
+  border: none;
+  font-size: 1rem;
+  color: white; /* Text color on top of gradient */
+  /* border-radius: 8px; */
+  background-size: 100% auto;
+  transition: background-position 0.3s ease;
+}
+
+.gradient-cto-three {
+  background-image: linear-gradient(to right, #eb2027d3, #f4901ee6);
+  border: none;
+  font-size: 1rem;
+  color: white; /* Text color on top of gradient */
+  /* border-radius: 8px; */
+  background-size: 100% auto;
+  transition: background-position 0.3s ease;
+}
+
+.gradient-cto {
+  background-image: linear-gradient(to right, #e9262a, #f36f26);
+  border: none;
+  font-size: 1rem;
+  color: white; /* Text color on top of gradient */
+  /* border-radius: 8px; */
+  cursor: pointer;
+  background-size: 100% auto;
+  transition: background-position 0.3s ease;
+}
+
+.cac {
+  width: 0;
+}
+.gradient-radial-1 {
+  background: radial-gradient(circle at center, transparent 0%, #ffffff 50%);
+}
+.gradient-radial-2 {
+  background: radial-gradient(circle at center, #ffffff, transparent 30%);
+}
+.gradient-radial-3 {
+  background: radial-gradient(circle at center, transparent 61%, #ffffff 63%);
+}
+
+.gradient-linier-1 {
+  background-image: linear-gradient(to top, transparent, #ffffff 70%);
+}
+.gradient-linier-2 {
+  background-image: linear-gradient(to bottom, transparent 0%, #ffffff 60%);
+}
+
+/* 1. Container spacing */
+.swiper-pagination {
+  margin-top: 2rem;
+  position: relative !important; /* Makes it sit below the slides instead of floating over them */
+}
+
+/* 2. Style ALL dots */
+.swiper-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
+  background-color: transparent !important;
+  border: 2px solid black !important;
+  opacity: 0.3 !important;
+  transition: all 0.3s ease-in-out;
+}
+
+/* 3. Style the ACTIVE dot */
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  background-color: #000000 !important; /* Your brand orange */
+  width: 12px !important; /* Makes the active dot an elongated pill shape */
+  height: 12px !important; /* Makes the active dot an elongated pill shape */
+  border-radius: 100% !important;
+}
+
+/* Add the parent container to make the rule "stronger" */
+.Popular-Campaign .swiper-wrapper .swiper-slide {
+  transition: transform 0.4s ease;
+  transform: scale(0.9) translateZ(0);
+  backface-visibility: hidden;
+}
+
+.Popular-Campaign .swiper-wrapper .swiper-slide-active {
+  transform: scale(1.01) translateZ(0);
+  z-index: 10;
+}
+
 .scroll_effect_child_ {
   transform: translateY(3rem);
 }
 
 .heading_ {
-  @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[3rem] lg:leading-[3.9rem];
+  @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-12 lg:leading-[3.9rem];
 }
 
 .button_ {
-  @apply bg-gradient-to-r from-[#812880] to-[#eb2027] to-60% rounded-lg text-white;
+  @apply bg-linear-to-r from-[#812880] to-[#eb2027] to-60% rounded-lg text-white;
 }
 
 .button_border_ {
-  @apply font-bold cursor-pointer border-[1px] border-transparent [background:linear-gradient(#fcfcfc,#fcfcfc)_padding-box,linear-gradient(90deg,#812880,#eb2027)_border-box];
+  @apply font-bold cursor-pointer border border-transparent [background:linear-gradient(#fcfcfc,#fcfcfc)_padding-box,linear-gradient(90deg,#812880,#eb2027)_border-box];
 }
 
 /* --------------------------------------------------------------------- */
@@ -168,10 +328,10 @@ body {
 /* --------------------------------------------------------------------- */
 
 #wallet:hover #wallet-child {
-  @apply pointer-events-auto opacity-100 translate-y-[0rem];
+  @apply pointer-events-auto opacity-100 translate-y-0;
 }
 #wallet-child:hover {
-  @apply pointer-events-auto opacity-100 translate-y-[0rem];
+  @apply pointer-events-auto opacity-100 translate-y-0;
 }
 
 .ripple {
@@ -214,7 +374,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(45deg, #000 0 1px, transparent 1px 4px),
+  background:
+    repeating-linear-gradient(45deg, #000 0 1px, transparent 1px 4px),
     repeating-linear-gradient(-45deg, #000 0 1px, transparent 1px 4px);
   opacity: 0.05;
   mix-blend-mode: multiply;

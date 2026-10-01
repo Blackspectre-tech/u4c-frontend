@@ -55,114 +55,86 @@ function PopularCampaign() {
     };
   }, []);
 
-  console.log("============== [  ] ================");
-  console.log(data);
-  console.log(swiperRef);
-  console.log("====================================");
+  // Inside your component, before the return
+  const slides = data?.results || [];
+  // If you have 4 slides and view 3, you need at least 6-8 for a smooth loop
+  const loopData =
+    slides.length > 0 && slides.length < 6 ? [...slides, ...slides] : slides;
+
+  // console.log("============== [  ] ================");
+  // console.log("============== [  ] ================");
+  // console.log("============== [  ] ================");
+  // console.log("============== [  ] ================");
+  // console.log(data);
+  // console.log(swiperRef);
+  // console.log(swiperRef.current?.activeIndex);
+  // console.log("====================================");
 
   return (
-    <div ref={ref_container} className="px-5 mt-[10rem]">
-      <h1 className="font-semibold text-center text-3xl mb-3">
-        Active verified campaigns
-      </h1>
+    <div ref={ref_container} className="relative px-5 py-10 mt-40">
+      <div className="absolute top-0 left-[50%] w-[90%] lg:w-[70%] h-full translate-x-[-50%] bg-primary/15 rounded-4xl"></div>
 
-      <p className="max-w-[40rem] text-lg text-center mx-auto">
-        All campaigns on U4C are verified, milestone-based, and transparently
-        tracked on the blockchain.
-      </p>
+      <div className="relative z-20">
+        <h1 className="font-semibold capitalize text-center text-3xl mb-3">
+          Active Verified Campaigns
+        </h1>
 
-      <div className="w-full mt-[5rem]">
-        <div className="flex justify-between gap-[3rem] text-black mb-10 px-5 xl:px-10">
-          <button
-            onClick={() => {
-              if (!swiperRef.current) return;
-              swiperRef.current.slidePrev();
+        <p className="max-w-160 text-center text-gray-700 mx-auto">
+          Projects verified by our compliance and partner network.
+        </p>
+      </div>
 
-              console.log("====================================");
-              console.log(swiperRef);
-              console.log("====================================");
-            }}
-            className="button_border_ min-w-[3.5rem] min-h-[3.5rem] lg:min-w-[4rem] lg:min-h-[4rem] rounded-full flex justify-center items-center text-[2.0rem] cursor-pointer"
-          >
-            <MdOutlineKeyboardArrowLeft />
-          </button>
-
-          <button
-            onClick={() => {
-              const s = swiperRef.current;
-              s.slideNext();
-
-              console.log("====================================");
-              console.log(swiperRef);
-              console.log("====================================");
-            }}
-            className="button_border_ min-w-[3.5rem] min-h-[3.5rem] lg:min-w-[4rem] lg:min-h-[4rem] rounded-full flex justify-center items-center text-[2.0rem] cursor-pointer"
-          >
-            <MdOutlineKeyboardArrowRight />
-          </button>
-        </div>
-
+      <div className="Popular-Campaign w-full mt-14">
         <Swiper
+          modules={[Pagination, Autoplay, Navigation]}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true, // Optional: dots change size dynamically
+          }}
+          key={data?.results?.length || 0}
           onSwiper={(swiper) => (swiperRef.current = swiper)}
-          speed={500} // how fast the content glides
-          spaceBetween={20}
-          slidesPerView={1} // 👈 base: mobile first
+          speed={500}
+          centeredSlides={true}
+          loop={true}
+          observer={true} // 👈 Add this
+          observeParents={true} // 👈 Add this
+          breakpoints={{
+            400: { slidesPerView: 1 },
+            750: { slidesPerView: 2 },
+            1300: { slidesPerView: 3 },
+          }}
         >
-          {[1, 2, 3, 4].map((campaign, index) => (
-            <SwiperSlide key={index}>
-              <Swiper
-                modules={[Autoplay]}
-                onSwiper={(swiper) => (swiperRef.current = swiper)}
-                loop={true}
-                speed={5000} // how fast the content glides
-                freeMode={{
-                  enabled: true,
-                  momentum: false,
-                }}
-                spaceBetween={20}
-                slidesPerView={1} // 👈 base: mobile first
-                autoplay={{
-                  delay: 0, // <- no pause between animations
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: false,
-                }}
-                breakpoints={{
-                  400: { slidesPerView: 1 },
-                  750: { slidesPerView: 2 },
-                  1300: { slidesPerView: 3 },
-                }}
-                allowTouchMove={false}
-              >
-                {isLoading
-                  ? [1, 2, 3, 4].map((campaign, index) => (
-                      <SwiperSlide key={index}>
-                        <div className="scroll_effect_child">
-                          <Campaign loading={true} status={""} deadline={""} />
-                        </div>
-                      </SwiperSlide>
-                    ))
-                  : data?.results.map((campaign: any, index: number) => (
-                      <SwiperSlide key={index}>
-                        <Campaign
-                          donate={true}
-                          loading={false}
-                          deadline={campaign?.deadline}
-                          status={campaign?.status}
-                          image={campaign?.image || ""}
-                          title={campaign?.title || ""}
-                          description={campaign?.description || ""}
-                          progress={campaign?.progress || ""}
-                          path={
-                            campaign?.id ? `/campaign?id=${campaign?.id}` : "#"
-                          }
-                          date={campaign?.created_at || null}
-                        />
-                      </SwiperSlide>
-                    ))}
-              </Swiper>
-            </SwiperSlide>
-          ))}
+          {isLoading
+            ? [1, 2, 3, 4].map((campaign, index) => (
+                <SwiperSlide key={index}>
+                  <div className="scroll_effect_child py-10 px-3">
+                    <Campaign loading={true} status={""} deadline={""} />
+                  </div>
+                </SwiperSlide>
+              ))
+            : loopData.map((campaign: any, index: number) => (
+                <SwiperSlide key={index}>
+                  <div className={`px-1 py-10 lg:px-3`}>
+                    <Campaign
+                      donate={true}
+                      loading={false}
+                      deadline={campaign?.deadline}
+                      status={campaign?.status}
+                      image={campaign?.image || ""}
+                      title={campaign?.title || ""}
+                      description={campaign?.description || ""}
+                      progress={campaign?.progress || ""}
+                      path={campaign?.id ? `/campaign?id=${campaign?.id}` : "#"}
+                      date={campaign?.created_at || null}
+                      sadaqah={campaign?.sadaqah === true}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
         </Swiper>
+
+        {/* CUSTOM DOTS CONTAINER */}
+        <div className="swiper-pagination-custom flex justify-center mt-6"></div>
       </div>
     </div>
   );

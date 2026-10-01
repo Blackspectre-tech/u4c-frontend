@@ -1,3 +1,13 @@
 {
-  "cSpell.words": ["chartjs", "geosearch", "gsap", "Wagmi"]
+  "cSpell.words": [
+    "chartjs",
+    "checksummed",
+    "geosearch",
+    "gsap",
+    "linkio",
+    "offchain",
+    "sadaqah",
+    "Wagmi"
+  ],
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }

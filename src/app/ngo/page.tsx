@@ -14,6 +14,12 @@ import {
 } from "@/redux/api/main";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/Pagination";
+import {
+  MdCancel,
+  MdLanguage,
+  MdLocationOn,
+  MdOutlineMail,
+} from "react-icons/md";
 
 type Params_Type = {
   categories__name: string;
@@ -22,6 +28,17 @@ type Params_Type = {
   size: number;
   page: number;
 };
+
+const social_platforms = [
+  { key: "instagram", Icon: SiInstagram, base: "https://instagram.com/" },
+  { key: "facebook", Icon: FaFacebook, base: "https://facebook.com/" },
+  { key: "twitter", Icon: FaTwitter, base: "https://x.com/" },
+  { key: "youtube", Icon: FaYoutube, base: "https://youtube.com/" },
+];
+
+// Socials may be saved as a full URL or just a handle.
+const social_link = (value: string, base: string) =>
+  value.startsWith("http") ? value : base + value.replace(/^@/, "");
 
 export default function Home() {
   const router = useRouter();
@@ -46,11 +63,16 @@ export default function Home() {
     console.log("(((((((((((((((())))))))))))))))))");
 
     const campaign = await Get_Campaign({ params, query: `/${id}` || "" });
+    console.log("campaign");
+    console.log("campaign");
+    console.log(campaign);
   };
 
   useEffect(() => {
     (async () => {
       const ngo = await Get_Ngo({ query: `/${id}/` });
+      refetch();
+
       if (error) router.back();
     })();
 
@@ -75,6 +97,8 @@ export default function Home() {
 
   const editStatus = async (value: string) => {
     if (value === "All Status") setParams((prev) => ({ ...prev, status: "" }));
+    else if (value === "Expired")
+      setParams((prev) => ({ ...prev, status: "Failed" }));
     else setParams((prev) => ({ ...prev, status: value }));
 
     await refetch();
@@ -86,98 +110,183 @@ export default function Home() {
   };
 
   const d_profile = "/icons/profile-icon.png";
+  const VERIFIED = data?.kyc_status === "verified";
 
   console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
   console.log(data);
   console.log(ngo_campaign);
   console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
+  const socials = social_platforms.filter(
+    (platform) => data?.socials?.[platform.key],
+  );
+
+  const location = data?.address
+    ? data?.country &&
+      !data.address.toLowerCase().includes(data.country.toLowerCase())
+      ? `${data.address}, ${data.country}`
+      : data.address
+    : data?.country || "";
+
+  const website_label = (data?.website || "")
+    .replace(/^https?:\/\//, "")
+    .replace(/\/$/, "");
+
+  const total_projects = Number(data?.total_projects || 0);
+  const onchain_projects = Number(data?.onchain_projects || 0);
+  const onchain_rate =
+    total_projects > 0
+      ? Math.round((onchain_projects / total_projects) * 100)
+      : 0;
+
+  // Opens the visitor's email app with a pre-filled enquiry to the organization.
+  const enquiry_link = data?.user?.email
+    ? `mailto:${data.user.email}?subject=${encodeURIComponent(
+        `Enquiry for ${data?.name || "your organization"}`,
+      )}&body=${encodeURIComponent(
+        `Hello ${data?.name || "there"},\n\nI found your organization on United4Change and would like to know more about your work.\n\n${typeof window !== "undefined" ? window.location.href : ""}\n\nThank you.`,
+      )}`
+    : "";
+
   return (
     <>
-      <div className=" px-5 sm:px-10 md:px-20 mt-[5rem]">
-        <div className="bg-gradient-to-r from-[#812880] to-[#eb2027] to-60% rounded-lg text-white relative h-[20rem]">
-          <div className="w-[15rem] h-[15rem] rounded-full bg-white absolute bottom-0 left-[50%] translate-x-[-50%] translate-y-[50%] p-2">
-            <div className="w-full h-full rounded-full relative overflow-hidden flex justify-center items-center">
-              {data?.user?.avatar ? (
-                <Image
-                  src={data?.user?.avatar}
-                  alt=""
-                  className="w-full h-full object-cover rounded-lg"
-                  fill
-                />
-              ) : (
-                <Image src={d_profile} alt="" width={150} height={150} />
-              )}
+      <div className="px-5 sm:px-10 mt-20">
+        <div className="relative rounded-4xl overflow-hidden bg-gray-100">
+          <div className="gradient-cto-two relative h-40 sm:h-56 overflow-hidden">
+            <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-white/10"></div>
+            <div className="absolute -bottom-24 left-[35%] w-72 h-72 rounded-full bg-white/10"></div>
+            <div className="absolute top-8 left-10 w-16 h-16 rounded-full bg-white/10"></div>
+          </div>
+
+          <div className="px-5 sm:px-10 pb-8 pt-10">
+            <div className="flex flex-col items-center gap-5 text-center -mt-16 sm:-mt-20 lg:flex-row lg:items-end lg:text-left">
+              <div className="relative w-32 h-32 min-w-32 sm:w-40 sm:h-40 sm:min-w-40 rounded-full bg-white p-1.5 shadow-lg">
+                <div className="relative w-full h-full rounded-full overflow-hidden flex justify-center items-center bg-gray-100">
+                  {data?.user?.avatar ? (
+                    <Image
+                      src={data?.user?.avatar}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      fill
+                    />
+                  ) : (
+                    <Image src={d_profile} alt="" width={110} height={110} />
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0 lg:pb-3">
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                  <h1 className="text-3xl sm:text-4xl font-bold">
+                    {data?.name}
+                  </h1>
+
+                  <div
+                    className={`${VERIFIED === true ? "bg-[#33b2ba]/5 text-[#1b5f64] border border-[#33b2ba]/25" : "bg-[#ba3333]/5 text-[#721e1e] border border-[#ba3333]/25"} rounded-full flex items-center gap-1.5 px-3 py-1`}
+                  >
+                    {VERIFIED === true ? (
+                      <FaCircleCheck className="text-[1.1rem]" />
+                    ) : (
+                      <MdCancel className="text-[1.2rem]" />
+                    )}
+
+                    <p className="text-sm font-semibold">
+                      {VERIFIED === true ? "Verified NGO" : "Un-Verified NGO"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mt-3 text-gray-600">
+                  {location && (
+                    <p className="flex items-center gap-2">
+                      <MdLocationOn className="text-[1.2rem]" />
+                      {location}
+                    </p>
+                  )}
+
+                  {data?.user?.email && (
+                    <p className="flex items-center gap-2 break-all">
+                      <MdOutlineMail className="text-[1.2rem]" />
+                      {data?.user?.email}
+                    </p>
+                  )}
+
+                  {data?.website && (
+                    <a
+                      href={data.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 break-all hover:text-black"
+                    >
+                      <MdLanguage className="text-[1.2rem]" />
+                      {website_label}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 lg:pb-3">
+                {socials.map(({ key, Icon, base }) => (
+                  <a
+                    key={key}
+                    href={social_link(data?.socials?.[key] || "", base)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={key}
+                    className="gradient-cto-border border border-transparent block w-11 h-11 rounded-full"
+                  >
+                    <span className="hover:bg-gray-50 w-full h-full flex items-center justify-center rounded-full text-[1.2rem]">
+                      <Icon />
+                    </span>
+                  </a>
+                ))}
+
+                {enquiry_link && (
+                  <a
+                    href={enquiry_link}
+                    title="Enquire about this organization"
+                    aria-label="Enquire about this organization"
+                    className="gradient-cto-border border border-transparent block w-fit rounded-xl"
+                  >
+                    <p className="hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold rounded-xl px-4 py-2.5">
+                      <MdOutlineMail className="text-[1.2rem]" />
+                      Enquire
+                    </p>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="text-center px-5 lg:px-10 mt-[9rem]">
-          <h1 className="text-3xl font-bold my-5">{data?.name}</h1>
-
-          <p className="text-xl font-semibold">{data?.user?.email}</p>
-
-          <div className="flex flex-wrap justify-center items-center gap-5 mt-5">
-            {data?.approval_status === "APPROVED" ? (
-              <div className="bg-[#33b2ba]/5 border-2 border-[#33b2ba]/50 text-[#1b5f64] rounded-lg flex items-center gap-1 px-5 py-2">
-                <div className="w-10 h-10 text-[1.5rem] flex justify-center items-center">
-                  <FaCircleCheck className="text-[1.7rem]" />
-                </div>
-                <p className="text-lg font-semibold wrap-break-word">
-                  Verified NGO
-                </p>
-              </div>
-            ) : (
-              <div className="bg-[#ba3333]/5 border-2 border-[#ba3333]/50 text-[#721e1e] rounded-lg flex items-center gap-1 px-5 py-2">
-                <div className="w-10 h-10 text-[1.5rem] flex justify-center items-center">
-                  <FaCircleCheck className="text-[1.7rem]" />
-                </div>
-                <p className="text-lg wrap-break-word">Verified NGO</p>
-              </div>
-            )}
-
-            {data?.socials?.instagram && (
-              <div
-                id="gradient-border"
-                className="w-[3.5rem] h-[3.5rem] min-w-[2.8rem] min-h-[2.8rem] xl:w-[3.2rem] xl:h-[3.2rem] xl:min-w-[3.2rem] xl:min-h-[3.2rem] flex justify-center items-center rounded-lg text-[1.5rem] bg-red-200"
-              >
-                <SiInstagram />
-              </div>
-            )}
-
-            {data?.socials?.facebook && (
-              <div
-                id="gradient-border"
-                className="w-[3.5rem] h-[3.5rem] min-w-[2.8rem] min-h-[2.8rem] xl:w-[3.2rem] xl:h-[3.2rem] xl:min-w-[3.2rem] xl:min-h-[3.2rem] flex justify-center items-center rounded-lg text-[1.5rem] bg-red-200"
-              >
-                <FaFacebook />
-              </div>
-            )}
-
-            {data?.socials?.twitter && (
-              <div
-                id="gradient-border"
-                className="w-[3.5rem] h-[3.5rem] min-w-[2.8rem] min-h-[2.8rem] xl:w-[3.2rem] xl:h-[3.2rem] xl:min-w-[3.2rem] xl:min-h-[3.2rem] flex justify-center items-center rounded-lg text-[1.5rem] bg-red-200"
-              >
-                <FaTwitter />
-              </div>
-            )}
-
-            {data?.socials?.youtube && (
-              <div
-                id="gradient-border"
-                className="w-[3.5rem] h-[3.5rem] min-w-[2.8rem] min-h-[2.8rem] xl:w-[3.2rem] xl:h-[3.2rem] xl:min-w-[3.2rem] xl:min-h-[3.2rem] flex justify-center items-center rounded-lg text-[1.5rem] bg-red-200"
-              >
-                <FaYoutube />
-              </div>
-            )}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
+          {[
+            { label: "Total Projects", value: `${total_projects}` },
+            { label: "Published On-chain", value: `${onchain_projects}` },
+            { label: "On-chain Rate", value: `${onchain_rate}%` },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-3xl bg-white border border-gray-200 shadow-sm p-6 text-center"
+            >
+              <p className="text-4xl font-bold">
+                <span id="gradient-txt">{stat.value}</span>
+              </p>
+              <p className="text-sm font-semibold text-gray-500 mt-1">
+                {stat.label}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <OurStory description={data?.description || ""} />
+      <OurStory description={data?.description || ""} verified={VERIFIED} />
 
       <div className="w-full p-5 sm:p-20 mt-[5rem]">
+        <h2 className="text-3xl font-bold mb-8 text-center sm:text-left">
+          Campaigns by <span id="gradient-txt">{data?.name}</span>
+        </h2>
+
         <ExploreFilter
           category={editCategory}
           status={editStatus}
@@ -210,6 +319,7 @@ export default function Home() {
                     progress={campaign?.progress || ""}
                     path={campaign?.id ? `/campaign?id=${campaign?.id}` : "#"}
                     date={campaign?.created_at || null}
+                    sadaqah={campaign?.sadaqah === true}
                   />
                 </div>
               ))}

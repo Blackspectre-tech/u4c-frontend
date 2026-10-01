@@ -12,14 +12,14 @@ const Steps = ({
   steps: { heading: string; paragraph: string }[];
 }) => {
   return (
-    <div className="bg-[#fcfcfc] flex flex-col items-center text-center px-5 sm:px-20 mt-[10rem] scroll_effect_parent_">
+    <div className="bg-[#fcfcfc] flex flex-col items-center text-center px-5 sm:px-20 mt-40 scroll_effect_parent_">
       <h1 className="font-semibold text-3xl mb-3">{heading}</h1>
       <p className="lg:w-[80%] xl:w-[70%] mx-auto">{subheading}</p>
 
       {first === true ? (
-        <div className="w-full gap-32 relative flex flex-col lg:items-center mt-[5rem]">
+        <div className="w-full gap-32 relative flex flex-col lg:items-center mt-20">
           {/* Vertical line in the middle */}
-          <div className="absolute top-0 left-0 xl:left-1/2 w-[1px] h-[85%] bg-[#00000036] lg:-translate-x-1/2 mt-5"></div>
+          <div className="absolute top-0 left-0 xl:left-1/2 w-px h-[85%] bg-[#00000036] lg:-translate-x-1/2 mt-5"></div>
 
           {steps.map((step, index) => {
             const side = index % 2 === 0 ? "left" : "right"; // 0 => left, 1 => right
@@ -45,7 +45,7 @@ const Steps = ({
                   <div
                     className={`flex items-center gap-1 lg:block relative mb-3`}
                   >
-                    <div className="lg:hidden translate-x-[-0.5rem] flex items-center gap-2">
+                    <div className="lg:hidden translate-x-2 flex items-center gap-2">
                       <div
                         id="gradient-border"
                         className={`min-w-4 min-h-4 rounded-full`}
@@ -83,7 +83,7 @@ const Steps = ({
                             side === "left"
                               ? "right-0 translate-x-[calc(100%+1rem)]"
                               : "left-0 translate-x-[calc(-100%-1rem)]"
-                          } translate-y-[-50%] w-[7rem] rounded-lg font-semibold px-5 py-2`}
+                          } translate-y-[-50%] w-28 rounded-lg font-semibold px-5 py-2`}
                         >
                           Step {index + 1}
                         </div>
@@ -92,7 +92,7 @@ const Steps = ({
                   </div>
 
                   <div
-                    className={`w-full xl:w-[70%] bg-gradient-to-r ${
+                    className={`w-full xl:w-[70%] bg-linear-to-r ${
                       side === "left"
                         ? "from-gray-200/50 to-transparent lg:from-transparent lg:to-gray-200/50 ml-5 lg:mr-5"
                         : "from-gray-200/50 to-transparent lg:from-gray-200/50 lg:to-transparent ml-5 lg:ml-5"
@@ -106,7 +106,7 @@ const Steps = ({
           })}
         </div>
       ) : (
-        <div className="w-full flex flex-col lg:grid grid-cols-2 gap-14 md:px-20 lg:px-0 xl:px-30 mt-[5rem]">
+        <div className="w-full flex flex-col lg:grid grid-cols-2 gap-14 md:px-20 lg:px-0 xl:px-30 mt-20">
           {steps.map((step, index) => {
             return (
               <div key={index} className={`flex flex-col text-left my-2`}>

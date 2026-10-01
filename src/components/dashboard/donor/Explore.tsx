@@ -1,6 +1,7 @@
 "use client";
 
 import CampaignCard from "@/components/Campaign";
+import CustomSelector from "@/components/SelectTag";
 import {
   useGetCampaignAwaitMutation,
   useGetCampaignQuery,
@@ -8,15 +9,21 @@ import {
 import { RootState } from "@/redux/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RiFileForbidFill } from "react-icons/ri";
 import { TbPlus } from "react-icons/tb";
 import { useSelector } from "react-redux";
 
 export default function Explore() {
-  const { user, organization } = useSelector((state: RootState) => state.user);
+  const { user, wallet_type } = useSelector((state: RootState) => state.user);
   const [Get_Campaign, { isLoading, data }] = useGetCampaignAwaitMutation();
-  const router = useRouter();
+  const [params, setParams] = useState({
+    categories__name: "",
+    search: "",
+    status: "",
+    size: 10,
+    page: 1,
+  });
 
   const refetch = async () => {
     const result = await Get_Campaign({ params: {} });
@@ -33,7 +40,7 @@ export default function Explore() {
     })();
 
     return () => {};
-  }, []);
+  }, [params]);
 
   console.log("====================================");
   console.log(user);
@@ -42,40 +49,54 @@ export default function Explore() {
 
   return (
     <div className="">
-      <div className="w-full relative bg-[#0000000a]/30 col-span-6 rounded-lg overflow-hidden object-center bg-[url('https://images.unsplash.com/photo-1740568439252-b060d7ff3437?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Ds')]">
-        <div className="w-full h-full bg-[linear-gradient(90deg,#812880a1,#eb2027e1)] text-white p-5 md:p-10">
-          <h1 className="text-2xl md:text-3xl font-semibold">
-            Welcome back,{" "}
-            <span className="font-bold">
-              {organization === true
-                ? user?.name
-                : `${user?.first_name} ${user?.last_name}`}
-              !
-            </span>
-          </h1>
-          <p className="mt-2">Here’s what happened since your last login</p>
-        </div>
-      </div>
-
       <div className="mt-[5rem]">
-        <div className="flex justify-between items-center">
-          <h1 className="font-bold text-2xl mb-2">Active Campaign</h1>
+        <div className="flex flex-wrap justify-between items-center gap-5">
+          <h1 className="font-bold text-2xl mb-2">Campaigns</h1>
 
-          {organization === true && (
-            <Link
-              href={"/dashboard/campaign/add"}
-              className="text-[#381237] font-bold cursor-pointer text-[1.5rem]
-             rounded-xl border-[2px] border-transparent
-             [background:linear-gradient(#fcfcfc,#fcfcfc)_padding-box,linear-gradient(90deg,#812880,#eb2027)_border-box] overflow-hidden"
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="w-[7rem] flex items-center gap-3 bg-gray-200 rounded-full">
+              <CustomSelector
+                // optionsList={["USDT", "USDC", "Fiat VIA Transak/Card"]}
+                control_class={"w-full"}
+                control_style={{
+                  // borderRadius: "0.5rem",
+                  border: "none",
+                  padding: "0.35rem 0.75rem",
+                  backgroundColor: "",
+                  outline: "0",
+                  stroke: "0",
+                  width: "100%",
+                  flex: 1,
+                }}
+                optionsList={Array.from({ length: 10 }, (_, i) =>
+                  String(i + 1),
+                )}
+                placeholder="10"
+                changeEvent={(selected) =>
+                  setParams((prev) => ({ ...prev, size: Number(selected) }))
+                }
+                mapOption={(val) => ({
+                  value: val,
+                  name: val,
+                  label: (
+                    <div className="flex items-center">
+                      <p>{val}</p>
+                    </div>
+                  ),
+                })}
+              />
+            </div>
+
+            {/* <Link
+              href={"/explore"}
+              className="gradient-cto rounded-full flex items-center gap-2 py-2 md:py-3 px-5"
             >
-              <div className="hover:bg-[#812880]/5 p-3">
-                <TbPlus />
-              </div>
-            </Link>
-          )}
+              <TbPlus /> <p className="">Explore Campaign</p>
+            </Link> */}
+          </div>
         </div>
 
-        <div className="flex flex-col min-[800]:grid grid-cols-2 min-[1450]:grid-cols-3 gap-5 mt-8 ">
+        <div className="flex flex-col md:grid grid-cols-2 xl:grid-cols-3 gap-5 mt-8 ">
           {isLoading
             ? [1, 2, 3, 5].map((campaign, index) => (
                 <div key={index} className="px-[0.625rem]">
@@ -112,7 +133,11 @@ export default function Explore() {
           {isLoading === false && !(data?.results?.length > 0) && (
             <div className="bg-[#0000000a]/30 border-2 border-[#0000000a]/70 rounded-lg flex flex-col justify-center items-center p-10">
               <RiFileForbidFill className="text-[3rem] font text-black/30 mb-3" />
-              <p>You do not have any active campaigns</p>
+              {wallet_type === "pending" ? (
+                <p>Kindly connect your wallet to view active campaigns</p>
+              ) : (
+                <p>You do not have any active campaigns</p>
+              )}
             </div>
           )}
         </div>

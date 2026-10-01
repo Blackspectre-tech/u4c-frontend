@@ -46,26 +46,23 @@ function Video() {
   return (
     <div
       ref={ref_container}
-      className="sm:w-[90%] lg:w-[80%] px-5 sm:px-0 mx-auto mt-[5rem]"
+      className="sm:w-[90%] lg:w-[80%] px-5 sm:px-0 mx-auto"
     >
       <div
         ref={ref_video}
-        id="gradient-border"
         className="rounded-lg m-auto w-[90%] lg:w-[90%] sticky top-0"
       >
-        <div className="rounded-lg bg-[#fcfcfc] p-2 md:p-5">
-          <div className="w-full bg-gray-100">
-            <video
-              autoPlay
-              muted
-              loop
-              controls
-              playsInline
-              className="w-full h-full rounded-md"
-            >
-              <source src="/video/u4c_FIN.mp4" type="video/mp4" />
-            </video>
-          </div>
+        <div className="rounded-4xl overflow-hidden w-full bg-white">
+          <video
+            autoPlay
+            muted
+            loop
+            controls
+            playsInline
+            className="w-full h-full rounded-md"
+          >
+            <source src="/video/u4c_FIN.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
     </div>

@@ -9,23 +9,25 @@ import { useGetPopularCampaignQuery } from "@/redux/api/main";
 import { use, useEffect, useState } from "react";
 
 export default function Home() {
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<{
+    categories__name: string;
+    search: string;
+    status: string;
+    sadaqah?: boolean;
+    size: number;
+    page: number;
+  }>({
     categories__name: "",
     search: "",
     status: "",
     size: 20,
     page: 1,
   });
-  const { isLoading, data, refetch, error } = useGetPopularCampaignQuery(
-    {
-      params: { ...params }, // ✅ object, not string
-    },
-    {
-      // pollingInterval: 10000, // every 10 seconds
-      // refetchOnFocus: true,
-      // refetchOnReconnect: true,
-    }
-  );
+  const { isLoading, data, refetch } = useGetPopularCampaignQuery({
+    params: { ...params },
+  });
+
+  console.log("[ params ]: ", params);
 
   // useEffect(() => {
   //   refetch().then(async () => {
@@ -45,7 +47,20 @@ export default function Home() {
 
   const editStatus = async (value: string) => {
     if (value === "All Status") setParams((prev) => ({ ...prev, status: "" }));
+    else if (value === "Expired")
+      setParams((prev) => ({ ...prev, status: "Failed" }));
     else setParams((prev) => ({ ...prev, status: value }));
+
+    await refetch();
+  };
+
+  const editSadaqah = async (active: boolean) => {
+    setParams((prev) => {
+      const { sadaqah, ...rest } = prev;
+      return active
+        ? { ...rest, sadaqah: true, page: 1 }
+        : { ...rest, page: 1 };
+    });
 
     await refetch();
   };
@@ -64,18 +79,20 @@ export default function Home() {
       <Hero
         heading="Explore "
         heading_styled="Campaigns"
-        paragraph="Search all projects currently in United 4 Change"
+        paragraph="Search all projects currently in United4Change"
       />
 
-      <div className="w-full p-5 sm:p-10 lg:p-20 mt-[5rem]">
+      <div className="w-full p-5 sm:p-10 lg:p-20 mt-20">
         <ExploreFilter
           category={editCategory}
           status={editStatus}
+          sadaqah={editSadaqah}
+          sadaqah_active={params.sadaqah}
           search={editSearch}
           search_value={params.search}
         />
 
-        <div className="mt-[5rem] flex flex-col md:grid grid-cols-2 xl:grid-cols-3 gap-5 sm:px-5">
+        <div className="mt-20 flex flex-col md:grid grid-cols-2 xl:grid-cols-3 gap-5 sm:px-5">
           {isLoading
             ? Array(10)
                 .fill(0)
@@ -107,6 +124,7 @@ export default function Home() {
                     progress={campaign?.progress || ""}
                     path={campaign?.id ? `/campaign?id=${campaign?.id}` : "#"}
                     date={campaign?.created_at || null}
+                    sadaqah={campaign?.sadaqah === true}
                   />
                 </div>
               ))}

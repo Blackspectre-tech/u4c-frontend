@@ -39,7 +39,7 @@ export default function Home() {
   ]);
   const [formData, setFormData] = useState<formType>({
     name: "",
-    country: "",
+    country: "Nigeria",
     address: "",
     description: "",
     user: { email: "", phone_number: "+234", password: "", password2: "" },
@@ -135,13 +135,12 @@ export default function Home() {
         <div className="col-span-6 relative z-10 p-3 sm:p-5">
           <form
             onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] p-4 sm:p-7"
+            className="gradient-cto-border border-2 border-transparent  bg-[#fcfcfc] rounded-[1rem] p-4 sm:p-7"
           >
             <div className="flex flex-col gap-5 px-2">
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Email</p>
                 </div>
 
@@ -158,8 +157,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3 mb-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3 mb-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     Phone number
                   </p>
@@ -195,8 +194,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     Password
                   </p>
@@ -215,8 +214,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     Confirm password
                   </p>
@@ -235,8 +234,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     Company name
                   </p>
@@ -255,8 +254,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Country</p>
                 </div>
 
@@ -264,8 +263,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Address</p>
                 </div>
 
@@ -282,8 +281,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     Description
                   </p>
@@ -302,8 +301,8 @@ export default function Home() {
               </label>
 
               <label className="col-span-2">
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Socials</p>
                 </div>
 
@@ -409,8 +408,8 @@ export default function Home() {
               </label>
 
               <label>
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                <div className="flex items-center gap-3 pl-3">
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Website</p>
                 </div>
 
@@ -425,11 +424,25 @@ export default function Home() {
                   className="w-full px-5 py-2 border border-black/15 outline-0 rounded-md mt-3"
                 />
               </label>
+
+              <div className="flex items-center gap-3">
+                <input type="checkbox" required />
+                <p className="text-sm">
+                  Accept our{" "}
+                  <Link href={"/privacy-policy"} className="font-bold">
+                    privacy policy
+                  </Link>{" "}
+                  and{" "}
+                  <Link href={"/terms-of-use"} className="font-bold">
+                    terms of use
+                  </Link>
+                </p>
+              </div>
             </div>
 
             <button
               disabled={isLoading}
-              className="w-full font-semibold button_ cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
+              className="gradient-cto rounded-xl w-full font-semibold cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
             >
               {isLoading && (
                 <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />

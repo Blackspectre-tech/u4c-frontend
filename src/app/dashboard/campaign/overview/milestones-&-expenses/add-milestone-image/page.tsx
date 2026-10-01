@@ -4,6 +4,7 @@ import CountrySelector from "@/components/CountrySelector";
 import BackButton from "@/components/dashboard/BackButton";
 import CustomSelector from "@/components/SelectTag";
 import { response_message } from "@/components/utilities/utils";
+import { NavigationTemplate } from "@/components/utilities/utils.template";
 import {
   useAddMilestoneImagesMutation,
   useCreateCampaignMutation,
@@ -13,7 +14,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters, AiOutlinePercentage } from "react-icons/ai";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaRegImages } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { PiEmptyBold } from "react-icons/pi";
 import { useSelector } from "react-redux";
@@ -38,6 +39,10 @@ export default function Home() {
   const router = useRouter();
   const params = useSearchParams();
   const id = params.get("id");
+  const surplus = params.get("surplus");
+  const deployed = params.get("deployed");
+  const project_id = params.get("project_id");
+  const campaign_percentage = params.get("campaign_percentage");
 
   useEffect(() => {
     if (organization === false || !id) return router.back();
@@ -54,10 +59,49 @@ export default function Home() {
   };
 
   const addFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    if (!files.length) return;
+    // 1. Convert FileList to Array
+    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
+    if (!selectedFiles.length) return;
 
-    const newImages = files.map((file) => ({
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+    const MAX_COUNT = 5;
+    const currentImagesCount = formData.images.length;
+
+    // 2. Filter out files that are too large
+    const validFiles = selectedFiles.filter((file) => {
+      if (file.size > MAX_SIZE) {
+        response_message({
+          message: `${file.name} is too large. Max size is 5MB.`,
+          option: "err",
+        });
+        return false;
+      }
+      return true;
+    });
+
+    // 3. Limit the total number of images to 5
+    const remainingSlots = MAX_COUNT - currentImagesCount;
+
+    if (remainingSlots <= 0) {
+      response_message({
+        message: "You have already reached the limit of 5 images.",
+        option: "err",
+      });
+      e.target.value = "";
+      return;
+    }
+
+    const filesToAdd = validFiles.slice(0, remainingSlots);
+
+    if (validFiles.length > remainingSlots) {
+      response_message({
+        message: `Only the first ${remainingSlots} valid images were added (Limit: 5).`,
+        option: "wrn",
+      });
+    }
+
+    // 4. Map to your state structure
+    const newImages = filesToAdd.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
       id: crypto.randomUUID(),
@@ -68,6 +112,7 @@ export default function Home() {
       images: [...prev.images, ...newImages],
     }));
 
+    // 5. Reset input so the same file can be picked again if deleted
     e.target.value = "";
   };
 
@@ -109,9 +154,9 @@ export default function Home() {
     setTimeout(
       () =>
         router.push(
-          `/dashboard/campaign/overview/milestones-&-expenses?id=${id}`
+          `/dashboard/campaign/overview/milestones-&-expenses?id=${id}&project_id=${project_id}&campaign_percentage=${campaign_percentage}&surplus=${surplus}&deployed=${deployed}`,
         ),
-      2000
+      2000,
     );
   };
 
@@ -120,84 +165,89 @@ export default function Home() {
   // console.log("====================================");
 
   return (
-    <div className="relative px-5 md:px-10 mt-10">
-      <div className="">
-        <div className="relative w-full h-full flex flex-col justify-between md:px-10">
-          <h1 className="text-4xl font-bold relative">
-            Add / Milestone images
-          </h1>
-          <p className="relative w-[80%] lg:w-[70%] mt-5">
-            We built United4Change to solve the trust problem in charity, by
-            using technology that proves every donation does what it says it
-            will. Giving has never been this transparent or borderless
-          </p>
-        </div>
+    <div className="relative px-5 md:px-10 pb-5">
+      <NavigationTemplate
+        title="Add Milestone Images"
+        navigation={[
+          {
+            title: "Overview",
+            path: `/dashboard/campaign/overview/milestones-&-expenses?id=${id}&project_id=${project_id}&campaign_percentage=${campaign_percentage}`,
+          },
+          {
+            title: "Milestone",
+            path: `/dashboard/campaign/overview/milestones-&-expenses?id=${id}`,
+          },
+          { title: "Add Milestone Images", path: "#" },
+        ]}
+      />
 
-        <div className="relative mt-5 md:p-5">
-          <BackButton
-            route={`/dashboard/campaign/overview/milestones-&-expenses?id=${id}`}
-            parent_wind="flex mb-5"
+      <div className="w-full min-h-80 h-80 flex items-center justify-center relative rounded-4xl bg-gray-100 border-2 border-dashed border-gray-500 p-10 mt-5">
+        <div className="w-[calc(100%-1rem)] h-[calc(100%-1rem)] bg-white/70 rounded-4xl relative z-10 flex flex-col items-center justify-center">
+          <label
+            htmlFor="Campaign-Banner"
+            className="gradient-cto text-white rounded-lg flex items-center gap-3 cursor-pointer px-5 py-3"
+          >
+            <FaRegImages className="text-[1.5rem]" />
+            <p>Upload Image</p>
+          </label>
+
+          <input
+            required
+            multiple
+            type="file"
+            sub-child={"false"}
+            onChange={addFile}
+            id="Campaign-Banner"
+            accept=".jpg,.jpeg,.png"
+            className="absolute opacity-0 pointer-events-none"
           />
 
-          <form
-            onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] border-2 px-3 md:px-7 py-7 md:py-10"
-          >
-            <label className="">
-              <div className="flex items-center gap-4 pl-3">
-                <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
-                <p className="text-sm font-semibold text-gray-500">images</p>
-              </div>
-
-              <input
-                type="file"
-                multiple
-                onChange={addFile}
-                // placeholder="smith"
-                accept=".jpg,.jpeg,.png"
-                className="w-full px-5 py-2 border border-black/15 outline-0 rounded-md mt-3"
-              />
-            </label>
-
-            {formData.images.length > 0 && (
-              <div className="w-[50%] mx-auto border-b-2 border-gray-500/10 mt-5 mb-10"></div>
-            )}
-
-            {/* Preview container */}
-            <div className="flex flex-wrap gap-3 mb-5 md:mb-10">
-              {formData.images?.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative w-[13rem] h-[13rem] border rounded-md overflow-hidden group"
-                >
-                  <img
-                    src={img.preview}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    onClick={() => handleDelete(img.id)}
-                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-80 hover:opacity-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button
-              disabled={isLoading}
-              className="w-full font-semibold button_ cursor-pointer md:mt-7 py-3 flex items-center justify-center gap-2"
-            >
-              {isLoading && (
-                <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />
-              )}
-              Submit
-            </button>
-          </form>
+          <p className="mt-2">Select an image, JPG, JPEG, PNG, Max 5mb.</p>
         </div>
       </div>
+
+      <form
+        onSubmit={submit}
+        className="gradient-cto-border rounded-2xl border-2 border-transparent p-5 lg:p-10 mt-5"
+      >
+        {/* Preview container */}
+        <div
+          className={`flex flex-wrap gap-3 ${
+            formData.images?.length > 0 && "mb-5 md:mb-10"
+          }`}
+        >
+          {formData.images?.map((img) => (
+            <div
+              key={img.id}
+              className="relative w-52 h-52 border rounded-md overflow-hidden group"
+            >
+              <img
+                src={img.preview}
+                alt="preview"
+                className="w-full h-full object-cover"
+              />
+              <button
+                onClick={() => handleDelete(img.id)}
+                className="gradient-cto absolute top-1 right-1 text-white text-xs px-2 py-1 rounded opacity-80 hover:opacity-100"
+              >
+                <p className="opacity-100">✕</p>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button
+          disabled={isLoading}
+          className={`gradient-cto rounded-full w-full font-semibold cursor-pointer ${
+            formData.images?.length > 0 && "md:mt-7"
+          } py-3 flex items-center justify-center gap-2`}
+        >
+          {isLoading && (
+            <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />
+          )}
+          Submit
+        </button>
+      </form>
     </div>
   );
 }

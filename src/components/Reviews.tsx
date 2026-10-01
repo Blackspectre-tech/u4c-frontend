@@ -8,14 +8,14 @@ import { Navigation } from "swiper/modules";
 
 function Reviews({ comments }: { comments: any }) {
   const swiperRef = useRef<any>(null);
-  console.log("====================================");
-  console.log(comments);
-  console.log("====================================");
+  // console.log("====================================");
+  // console.log(comments);
+  // console.log("====================================");
 
   return (
     <>
-      {comments?.lenght > 0 && (
-        <div className="px-5 py-10 bg-[#F2F8F9] mt-[5rem]">
+      {comments?.length > 0 && (
+        <div className="px-5 py-10 bg-[#F2F8F9] mt-20">
           <Swiper
             modules={[Navigation]}
             navigation={{

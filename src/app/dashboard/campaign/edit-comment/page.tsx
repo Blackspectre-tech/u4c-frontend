@@ -2,6 +2,7 @@
 
 import BackButton from "@/components/dashboard/BackButton";
 import { response_message } from "@/components/utilities/utils";
+import { NavigationTemplate } from "@/components/utilities/utils.template";
 import {
   useGetCommentMutation,
   usePatchCommentMutation,
@@ -33,12 +34,16 @@ export default function Home() {
     console.log(id);
     console.log("====================================");
 
-    if (!id) return router.back();
+    if (!id || !campaign) return router.back();
     if (organization === true) return router.back();
 
     (async () => {
       const result = await Get_Comment({ query: `/${id}/` });
 
+      console.log("result.data");
+      console.log("result.data");
+      console.log("result.data");
+      console.log("result.data");
       console.log(result.data);
 
       if ("error" in result) return;
@@ -85,7 +90,7 @@ export default function Home() {
     });
     setTimeout(
       () => router.push(`/dashboard/campaign/overview?id=${campaign}`),
-      2000
+      2000,
     );
   };
 
@@ -95,56 +100,53 @@ export default function Home() {
 
   return (
     <div className="relative px-5 md:px-10 mt-10">
-      <div className="">
-        <div className="relative w-full h-full flex flex-col justify-between md:px-10">
-          <h1 className="text-4xl font-bold relative">Edit / Comment</h1>
-          <p className="relative md:w-[80%] lg:w-[70%] mt-5">
-            We built United4Change to solve the trust problem in charity, by
-            using technology that proves every donation does what it says it
-            will. Giving has never been this transparent or borderless
-          </p>
-        </div>
+      <NavigationTemplate
+        title="Edit Comment"
+        navigation={[
+          { title: "Dashboard", path: "/dashboard" },
+          { title: "Campaigns", path: "/dashboard/campaign" },
+          {
+            title: "Overview",
+            path: `/dashboard/campaign/overview?id=${campaign}`,
+          },
+          { title: "Edit Comment", path: "#" },
+        ]}
+      />
 
-        <div className="relative mt-5 md:p-5">
-          <BackButton route="/dashboard/campaign" parent_wind="flex mb-5" />
-
-          <form
-            onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] border-2 px-2 md:px-7 py-10"
-          >
-            <div className="flex flex-col md:grid grid-cols-2 gap-5 px-3">
-              <label className="col-span-2">
-                <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
-                  <p className="text-sm font-semibold text-gray-500">Comment</p>
-                </div>
-
-                <textarea
-                  required
-                  minLength={10}
-                  name="details"
-                  sub-child={"false"}
-                  value={formData.details}
-                  onChange={editFormData}
-                  // placeholder="smith"
-                  className="w-full h-[10rem] resize-none px-5 py-2 border border-black/15 outline-0 rounded-md mt-3"
-                />
-              </label>
+      <form
+        onSubmit={submit}
+        className="gradient-cto-border rounded-[1rem] border-2 border-transparent p-5 lg:p-10 mt-5"
+      >
+        <div className="flex flex-col md:grid grid-cols-2 gap-5 px-3">
+          <label className="col-span-2">
+            <div className="flex items-center gap-4 pl-3">
+              <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
+              <p className="text-sm font-semibold text-gray-500">Comment</p>
             </div>
 
-            <button
-              disabled={isLoading}
-              className="w-full font-semibold button_ cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
-            >
-              {isLoading && (
-                <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />
-              )}
-              Submit
-            </button>
-          </form>
+            <textarea
+              required
+              minLength={10}
+              name="details"
+              sub-child={"false"}
+              value={formData.details}
+              onChange={editFormData}
+              // placeholder="smith"
+              className="w-full h-[10rem] resize-none px-5 py-2 border border-black/15 outline-0 rounded-md mt-3"
+            />
+          </label>
         </div>
-      </div>
+
+        <button
+          disabled={isLoading}
+          className="gradient-cto rounded-full w-full font-semibold cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
+        >
+          {isLoading && (
+            <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />
+          )}
+          Submit
+        </button>
+      </form>
     </div>
   );
 }

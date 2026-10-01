@@ -1,22 +1,22 @@
 "use client";
 
 import { response_message } from "@/components/utilities/utils";
-import {
-  useEditPasswordMutation,
-  useForgotPasswordMutation,
-  useSignInMutation,
-} from "@/redux/api/main";
+import { useEditPasswordMutation } from "@/redux/api/main";
+import { RootState } from "@/redux/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { TbExternalLink } from "react-icons/tb";
+import { useSelector } from "react-redux";
 
 export default function Home() {
-  const router = useRouter();
+  const { verify_email } = useSelector((state: RootState) => state.user);
   const [formData, setFormData] = useState({ otp: "", new_password: "" });
   const [Edit_Password, { isLoading }] = useEditPasswordMutation();
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const editFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((priv) => ({ ...priv, [e.target.name]: e.target.value }));
@@ -26,7 +26,10 @@ export default function Home() {
     e.preventDefault();
     console.log(formData);
 
-    const result = await Edit_Password({ params: {}, body: formData });
+    const result = await Edit_Password({
+      params: {},
+      body: { ...formData, email: verify_email },
+    });
 
     console.log(result);
     const is_message = result.error?.data?.errors;
@@ -50,7 +53,7 @@ export default function Home() {
   };
 
   return (
-    <div className="mt-[5rem] flex justify-center items-center">
+    <div className="mt-20 flex justify-center items-center">
       <div className="lg:w-[85%] xl:grid grid-cols-10 px-5 sm:px-10 md:px-20">
         <div className="col-span-4 relative w-full h-full flex flex-col justify-between p-10">
           <div className="absolute top-0 left-0 w-full h-[150%] xl:w-[120%] xl:h-full rounded-b-lg bg-[#33b1ba1c]/10 border-2 border-[#33b1baa2]/30 rounded-md"></div>
@@ -80,13 +83,12 @@ export default function Home() {
         <div className="col-span-6 relative z-10 p-5">
           <form
             onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1.5rem] border-2 border-[#6161618a]/7 p-7"
+            className="gradient-cto-border bg-[#fcfcfc] rounded-2xl border-2 border-transparent p-7"
           >
             <div className="flex flex-col gap-5 px-2">
               <label>
                 <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">Otp</p>
                 </div>
 
@@ -103,13 +105,13 @@ export default function Home() {
 
               <label>
                 <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">
                     New Password
                   </p>
                 </div>
 
-                <input
+                {/* <input
                   required
                   type="password"
                   name="new_password"
@@ -117,13 +119,36 @@ export default function Home() {
                   onChange={editFormData}
                   // placeholder="example@gmail.com"
                   className="w-full px-5 py-2 border border-black/15 outline-0 rounded-md mt-3"
-                />
+                /> */}
+
+                <div className="border border-black/15 outline-0 rounded-md flex items-center gap-2 px-4 mt-3">
+                  <input
+                    required
+                    // If showPassword is true, use 'text', otherwise use 'password'
+                    type={showPassword ? "text" : "password"}
+                    name="new_password"
+                    value={formData.new_password}
+                    onChange={editFormData}
+                    className="w-full border-0 outline-0 stroke-0 py-2"
+                  />
+
+                  <div
+                    className="cursor-pointer select-none"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <IoEye className="text-2xl text-gray-500" />
+                    ) : (
+                      <IoEyeOff className="text-2xl text-gray-500" />
+                    )}
+                  </div>
+                </div>
               </label>
             </div>
 
             <button
               disabled={isLoading}
-              className="w-full font-semibold button_ cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
+              className="gradient-cto rounded-xl w-full font-semibold cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
             >
               {isLoading && (
                 <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />

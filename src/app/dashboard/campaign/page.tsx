@@ -7,8 +7,10 @@ import { useSelector } from "react-redux";
 
 export default function Home() {
   const { online, organization } = useSelector(
-    (state: RootState) => state.user
+    (state: RootState) => state.user,
   );
+
+  console.log(organization);
 
   return (
     <div className="px-5 sm:px-10">

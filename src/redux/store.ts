@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
   persistReducer,
+  createMigrate,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -33,11 +34,23 @@ const storage =
     ? createWebStorage("local")
     : createNoopStorage();
 
+const migrations: Record<number, (state: any) => any> = {
+  2: (state) => {
+    const { main_slice: _a, ...rest } = state ?? {};
+    return rest;
+  },
+  3: (state) => {
+    const { cart: _a, ...rest } = state ?? {};
+    return rest;
+  },
+};
+
 const persistConfig = {
   key: "root",
-  version: 1,
+  version: 3,
   storage: storage,
   blacklist: ["api"],
+  migrate: createMigrate(migrations, { debug: false }),
 };
 
 const reducers = combineReducers({

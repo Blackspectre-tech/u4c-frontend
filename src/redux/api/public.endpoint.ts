@@ -37,55 +37,40 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/projects" + query,
         method: "GET",
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
-    // ---------------------------------------------- [ get-profile ]
-    getProfileBackgroundTask: builder.query<
+    // ----------------------------------------------------- [ sign-in ]
+    getCampaignNgo: builder.mutation<
       CampaignResponse, // ✅ response type
-      { params?: Record<string, any> } | void // ✅ argument type
+      {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      } | void // ✅ argument type
     >({
-      query: ({ params = {} }: { params?: Record<string, any> }) => ({
-        url: "/account/my-profile/",
+      query: ({
+        params = {},
+        body = {},
+        query = "/",
+      }: {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      }) => ({
+        url: "/projects" + query,
         method: "GET",
+        body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
-
-      // onQueryStarted is useful for optimistic updates
-      // The 2nd parameter is the destructured `MutationLifecycleApi`
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-        } catch (err: any) {
-          console.log(err);
-
-          if (err?.error?.data === "Axios Error") dispatch(setDefault({}));
-        }
-      },
-    }),
-
-    // ---------------------------------------------- [ get-profile ]
-    getProfile: builder.mutation<
-      CampaignResponse, // ✅ response type
-      { params?: Record<string, any> } | void // ✅ argument type
-    >({
-      query: ({ params = {} }: { params?: Record<string, any> }) => ({
-        url: "/account/my-profile/",
-        method: "GET",
-        params: params,
-      }),
-
-      // onQueryStarted is useful for optimistic updates
-      // The 2nd parameter is the destructured `MutationLifecycleApi`
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-        } catch (err: any) {
-          console.log(err);
-
-          if (err?.error?.data === "Axios Error") dispatch(setDefault({}));
-        }
-      },
     }),
 
     // ---------------------------------------------- [ get-profile ]
@@ -97,6 +82,26 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: "/website/faq/",
         method: "GET",
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
+      }),
+    }),
+
+    // ---------------------------------------------- [ get-profile ]
+    getStats: builder.query<
+      CampaignResponse, // ✅ response type
+      { params?: Record<string, any> } | void // ✅ argument type
+    >({
+      query: ({ params = {} }: { params?: Record<string, any> }) => ({
+        url: "/website/platform-status/",
+        method: "GET",
+        params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -116,6 +121,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -135,6 +144,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -154,6 +167,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -173,6 +190,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -192,6 +213,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -211,6 +236,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -230,6 +259,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
 
@@ -249,6 +282,10 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         method: "POST",
         body: body,
         params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
     // ---------------------------------------------- [ get-popular-campaign ]
@@ -269,10 +306,13 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         body?: Record<string, any>;
         query?: string;
       }) => ({
-        // url: `/projects/${query}/comments/add/`,
         url: `/account/organization` + query,
         method: "GET",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
     }),
     // ---------------------------------------------- [ get-popular-campaign ]
@@ -296,7 +336,93 @@ export const public_endpoints = (builder: EndpointBuilder<any, any, any>) => {
         url: `/projects/organization` + query,
         method: "GET",
         body: body,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
       }),
+    }),
+    // ----------------------------------------------------- [ sign-in ]
+    getDonations: builder.mutation<
+      CampaignResponse, // ✅ response type
+      {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      },
+      void // ✅ argument type
+    >({
+      query: ({
+        params = {},
+        body = {},
+        query = "/",
+      }: {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      }) => ({
+        url: `/projects${query}donations/`,
+        method: "GET",
+        body: body,
+        params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
+      }),
+
+      // onQueryStarted is useful for optimistic updates
+      // The 2nd parameter is the destructured `MutationLifecycleApi`
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          await queryFulfilled;
+        } catch (err: any) {
+          console.log(err);
+
+          if (err?.error?.data === "Axios Error") dispatch(setDefault({}));
+        }
+      },
+    }),
+    // ----------------------------------------------------- [ sign-in ]
+    getComments: builder.mutation<
+      CampaignResponse, // ✅ response type
+      {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      },
+      void // ✅ argument type
+    >({
+      query: ({
+        params = {},
+        body = {},
+        query = "/",
+      }: {
+        params?: Record<string, any>;
+        body?: Record<string, any>;
+        query?: string;
+      }) => ({
+        url: `/projects${query}comments/`,
+        method: "GET",
+        body: body,
+        params: params,
+        extraData: {
+          useMultipart: false,
+          requireToken: false,
+        },
+      }),
+
+      // onQueryStarted is useful for optimistic updates
+      // The 2nd parameter is the destructured `MutationLifecycleApi`
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          await queryFulfilled;
+        } catch (err: any) {
+          console.log(err);
+
+          if (err?.error?.data === "Axios Error") dispatch(setDefault({}));
+        }
+      },
     }),
   };
 };

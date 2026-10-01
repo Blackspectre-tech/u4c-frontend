@@ -30,7 +30,10 @@ export default function Home() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = await Verify_Email({ params: {}, body: formData });
+    const result = await Verify_Email({
+      params: {},
+      body: { ...formData, email: verify_email },
+    });
     console.log(result);
 
     const is_message = result.error?.data?.errors;
@@ -86,7 +89,7 @@ export default function Home() {
   };
 
   return (
-    <div className="mt-[5rem] flex justify-center items-center">
+    <div className="mt-20 flex justify-center items-center">
       <div className="lg:w-[85%] xl:grid grid-cols-10 px-5 sm:px-10 md:px-20">
         <div className="col-span-4 relative w-full h-full flex flex-col justify-between p-7 sm:p-10">
           <div className="absolute top-0 left-0 w-full h-[150%] xl:w-[120%] xl:h-full rounded-b-lg bg-[#33b1ba1c]/10 border-2 border-[#33b1baa2]/30 rounded-md"></div>
@@ -115,13 +118,12 @@ export default function Home() {
         <div className="col-span-6 relative z-10 p-3 sm:p-5">
           <form
             onSubmit={submit}
-            id="gradient-border"
-            className="bg-[#fcfcfc] rounded-[1rem] border-2 border-[#6161618a]/7 p-4 sm:p-7"
+            className="gradient-cto-border rounded-2xl border border-transparent bg-[#fcfcfc] p-4 sm:p-7"
           >
             <div className="flex flex-col gap-5 px-2">
               <label>
                 <div className="flex items-center gap-4 pl-3">
-                  <div className="w-2 h-2 min-w-2 min-h-2 bg-[#812880] rounded-full"></div>
+                  <div className="w-2 h-2 min-w-2 min-h-2 bg-primary rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-500">OTP</p>
                 </div>
 
@@ -149,7 +151,7 @@ export default function Home() {
 
             <button
               disabled={isLoadingVerify}
-              className="w-full font-semibold button_ cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
+              className="gradient-cto rounded-xl w-full font-semibold cursor-pointer mt-7 py-3 flex items-center justify-center gap-2"
             >
               {isLoadingVerify && (
                 <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />

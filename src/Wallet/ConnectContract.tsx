@@ -1,203 +1,18 @@
-import { response_message } from "@/components/utilities/utils";
-import { getWalletClient } from "@wagmi/core";
-import { wagmiAdapter } from "./config/Configuration";
-import { getSignerOrProvider } from "./Utilities";
 import { ethers } from "ethers";
+import { Get_Gas_Overrides, Wallet_Error_Message } from "./wallet.utils"; // Ensure this uses getEthereumProvider
+import { ConnectedWallet } from "@privy-io/react-auth";
+import { response_message } from "@/components/utilities/utils";
+import {
+  ALCHEMY_URL,
+  CONTRACT_ADDRESS,
+  ensureCorrectNetwork,
+  NETWORK,
+} from "./privy/privy.utils";
+import { ABI, Treasury_ABI } from "./wallet.abi";
 
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-const CONTRACT_ADDRESS = "0x89732089FAe1067437e71Fc5Debcd1E9f376483a";
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-
-// ✅ Connect to contract with provider/signer
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-async function connectToContract({ useSigner = false } = {}) {
-  const signerOrProvider = await getSignerOrProvider(useSigner);
-
-  const contractABI = [
-    "function createCampaign(uint8 currencyType, address token, uint256 _goal, uint256 _durationInDays, string[] milestoneNames, uint256[] milestoneAmounts) external returns (uint256)",
-    "function pledgeToken(uint256 id, uint256 grossAmount, uint256 tipAmount) external returns (uint256)",
-    "function withdrawMilestone(uint256 id, uint256 index) external",
-    "function refund(uint256 id) external",
-    "function platformWallet() view returns (address)",
-    "function getMilestone(uint256 id, uint256 index) view returns (string name, uint256 amount)",
-    "function getCampaignCore(uint256 id) view returns (tuple(uint256 id, address creator, address token, uint256 goal, uint256 pledged, uint8 currencyType))",
-  ];
-
-  const contract = new ethers.Contract(
-    CONTRACT_ADDRESS,
-    contractABI,
-    signerOrProvider
-  );
-
-  return contract;
-}
-
-// ✅ Generic call (read/write)
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function callContractFunction<T = any>(
-  functionName: string,
-  args: any[] = [],
-  readOnly = true
-): Promise<T | null> {
-  try {
-    const contract = await connectToContract({ useSigner: !readOnly });
-
-    if (typeof contract[functionName] !== "function") {
-      throw new Error(`Function "${functionName}" not found on contract`);
-    }
-
-    if (readOnly) {
-      return (await contract[functionName](...args)) as T;
-    } else {
-      const tx = await contract[functionName](...args);
-      console.log("Tx sent:", tx.hash);
-
-      const receipt = await tx.wait();
-      console.log("Tx confirmed:", receipt);
-
-      return receipt as T;
-    }
-  } catch (err: any) {
-    console.error(`Error calling ${functionName}:`, err);
-    throw new Error(err?.reason || err?.message || "Contract call failed.");
-  }
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Platform_Address() {
-  return await callContractFunction<string>("platformWallet", [], true);
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Get_Milestone(id: number, index: number) {
-  return await callContractFunction<[string, bigint]>(
-    "getMilestone",
-    [id, index],
-    true
-  );
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Create_Campaign({
-  currencyType,
-  token,
-  goal,
-  durationInDays,
-  milestoneNames,
-  milestoneAmounts,
-}: {
-  currencyType: number;
-  token: string;
-  goal: number;
-  durationInDays: number;
-  milestoneNames: Array<string>;
-  milestoneAmounts: Array<number>;
-}) {
-  const goal_ = ethers.parseUnits(String(goal), 6); // example: 100 tokens = 100000000
-  const milestoneAmounts_ = milestoneAmounts.map((amt) =>
-    ethers.parseUnits(String(amt), 6)
-  );
-
-  const body = [
-    currencyType,
-    token,
-    goal_,
-    durationInDays,
-    milestoneNames,
-    milestoneAmounts_,
-  ];
-
-  console.log("====================================");
-  console.log(body);
-  console.log("====================================");
-
-  try {
-    const result = await callContractFunction(
-      "createCampaign",
-      [...body],
-      false // 🚨 must be false => use signer
-    );
-
-    return { status: true, result: result };
-  } catch (err: any) {
-    response_message({
-      message: err || "Something went wrong?",
-      option: "err",
-    });
-
-    console.log("Pledge_Token error:", err);
-    return null;
-  }
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Withdraw_Milestone({
-  id,
-  index,
-}: {
-  id: number;
-  index: number;
-}) {
-  try {
-    const result = await callContractFunction(
-      "withdrawMilestone",
-      [id, index],
-      false // 👈 write operation
-    );
-
-    return { status: true, result: result };
-  } catch (err: any) {
-    response_message({
-      message: err || "Something went wrong?",
-      option: "err",
-    });
-
-    console.log("Pledge_Token error:", err);
-    return null;
-  }
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Get_Campaign_Core(id: number) {
-  try {
-    const result = await callContractFunction<any>(
-      "getCampaignCore",
-      [id],
-      true
-    );
-
-    if (!result) return null;
-
-    // ethers v6 returns tuple-like array + object with named keys
-    console.log("CampaignCore:", result);
-
-    // If your struct includes token address, you can extract it
-    const tokenAddress = result.token ?? result[2];
-    console.log("Campaign token:", tokenAddress);
-
-    return result;
-  } catch (err: any) {
-    response_message({
-      message: err || "Something went wrong?",
-      option: "err",
-    });
-
-    console.log("Pledge_Token error:", err);
-    return null;
-  }
-}
-
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
+// ------------------------------------------------------------------------------------------------ [  ]
+// ------------------------------------------------------------------------------------------------ [  ]
+// ABI --- Smart Contract Function
 export const erc20ABI = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",
@@ -209,252 +24,477 @@ export const erc20ABI = [
   "function transfer(address to, uint256 amount) returns (bool)",
   "function transferFrom(address from, address to, uint256 amount) returns (bool)",
 ];
+// ------------------------------------------------------------------------------------------------ [  ]
+// ------------------------------------------------------------------------------------------------ [  ]
 
-export async function Pledge_Token({
-  id,
-  grossAmount,
-  tipAmount,
-  token, // 👈 ERC20 token address (from core[2])
-}: {
-  id: number;
-  grossAmount: number;
-  tipAmount: number;
-  token: string;
-}) {
-  try {
-    // ✅ Use Reown/Wagmi wallet client instead of window.ethereum
-    const walletClient = await getWalletClient(wagmiAdapter.wagmiConfig);
-    if (!walletClient) {
-      return response_message({
-        message: "Please connect your wallet first.",
-        option: "wrn",
-      });
-    }
+// ✅ Connect to contract with provider/signer
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function connectToContract(
+  useSigner = false,
+  wallet?: ConnectedWallet,
+) {
+  console.log("Connecting to contract. Signer required:", useSigner);
 
-    // ✅ Wrap the walletClient in an ethers provider
-    const provider = new ethers.BrowserProvider(walletClient.transport);
+  if (useSigner && wallet) {
+    await ensureCorrectNetwork(wallet);
+    const eip1193Provider = await wallet.getEthereumProvider();
+
+    // 🟢 FIX: Create a provider that is LOCKED to the network
+    // This prevents the "80002 => 137" flip error
+    const provider = new ethers.BrowserProvider(eip1193Provider, NETWORK, {
+      staticNetwork: NETWORK,
+    });
+
     const signer = await provider.getSigner();
 
-    // ✅ Load the ERC20 token contract with the Reown signer
-    const erc20 = new ethers.Contract(token, erc20ABI, signer);
-
-    // ✅ Fetch token decimals
-    const decimals = await erc20.decimals();
-
-    // ✅ Convert human-friendly numbers to smallest units
-    const grossAmount_ = ethers.parseUnits(String(grossAmount), decimals);
-    const tipAmount_ = ethers.parseUnits(String(tipAmount), decimals);
-    const sumAmount_ = ethers.parseUnits(
-      String(Number(grossAmount) + Number(tipAmount)),
-      decimals
+    // DEBUG: If this logs "undefined", getSigner() failed
+    console.log(
+      "\n\n\n\n\Signer address:",
+      await signer.getAddress(),
+      "\n\n\n\n",
     );
 
-    const body = [id, grossAmount_, tipAmount_];
+    // return new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+    return new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+  }
 
-    console.log("====================================");
-    console.log("Token:", token);
-    console.log("Decimals:", decimals);
-    console.log("Pledge body:", body);
-    console.log("====================================");
+  // Read-only logic stays the same
+  const provider = new ethers.JsonRpcProvider(ALCHEMY_URL, NETWORK, {
+    staticNetwork: NETWORK,
+  });
 
-    // ✅ Check allowance
-    const account = await signer.getAddress();
-    const allowance = await erc20.allowance(account, CONTRACT_ADDRESS);
+  // return new ethers.Contract(CONTRACT_ADDRESS, contractABI, provider);
+  return new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+}
 
-    console.log("Current allowance:", ethers.formatUnits(allowance, decimals));
+// ✅ Generic call (read/write)
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function callContractFunction<T = any>(
+  functionName: string,
+  args: any[] = [],
+  readOnly = true,
+  wallet?: ConnectedWallet, // 👈 Pass this down
+): Promise<T | null> {
+  console.log("\n\n\n\n================= [ args ]: ");
+  console.log("=================");
+  console.log(wallet);
+  console.log(args);
 
-    if (allowance < sumAmount_) {
-      console.log("Allowance too low, approving first...");
-      response_message({
-        message: "Waiting for token approval...",
-        option: "wrn",
-      });
+  try {
+    const contract = await connectToContract(!readOnly, wallet);
 
-      const approveTx = await erc20.approve(CONTRACT_ADDRESS, sumAmount_);
-      await approveTx.wait();
-      console.log("✅ Approval confirmed");
+    if (readOnly) {
+      return (await contract[functionName](...args)) as T;
+    } else {
+      // 🟢 Apply gas pump for Testnet write operations
+      const gasOverrides = await Get_Gas_Overrides(
+        contract.runner?.provider as ethers.Provider,
+      );
+
+      const override = Object.keys(gasOverrides).length > 0;
+
+      console.log("\n\noverride");
+      console.log("override");
+      console.log(override);
+
+      console.log("\n\ngasOverrides");
+      console.log("gasOverrides");
+      console.log(gasOverrides);
+
+      const tx = override
+        ? await contract[functionName](...args, {
+            ...gasOverrides,
+            gasLimit: 1000000,
+          })
+        : await contract[functionName](...args, { gasLimit: 1000000 });
+
+      const receipt = await tx.wait();
+      return receipt as T;
     }
+  } catch (err: any) {
+    console.log("\n\n\n[ callContractFunction ]");
+    console.log("[ callContractFunction ]");
+    console.log("[ callContractFunction ]\n\n");
 
-    // ✅ Now call pledgeToken with the contract signer
-    const result = await callContractFunction(
-      "pledgeToken",
-      body,
-      false // signer mode
+    throw err;
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Platform_Address() {
+  return await callContractFunction<string>("platformWallet", [], true);
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Get_Milestone(id: number, index: number) {
+  return await callContractFunction<[string, bigint]>(
+    "getMilestone",
+    [id, index],
+    true,
+  );
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Get_User_Pledge(id: number, donorAddress: string) {
+  try {
+    // 1. Ensure the ID is a BigInt for the contract
+    const campaignId = BigInt(id);
+
+    // 2. Call the 'getPledge' function from your ABI
+    const result = await callContractFunction<bigint>(
+      "getPledge",
+      [campaignId, donorAddress],
+      true, // readOnly = true
     );
 
-    return { status: true, result };
+    // 3. The contract returns a uint256. If it's null, assume 0.
+    return result ? result : 0n;
   } catch (err: any) {
-    console.error("Pledge_Token error:", err);
+    console.error("Get_User_Pledge error:", err);
+    return 0n;
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Get_Campaign_Details(id: number) {
+  try {
+    const campaignId = BigInt(id);
+
+    // console.log("campaignId");
+    // console.log("campaignId");
+    // console.log("campaignId");
+    // console.log("campaignId");
+    // console.log(campaignId);
+    // console.log(id);
+
+    const result = await callContractFunction<any>(
+      "getCampaign",
+      [campaignId],
+      true,
+    );
+
+    if (!result) return null;
+
+    // 🟢 Don't log 'result' directly yet!
+    // Accessing a simple uint256 at the start of the tuple is safer for debugging.
+    // 🟢 Step-by-step access to find the "landmine"
+    // console.log(")))))))))))))))))))))))))))))))))))))");
+    // console.log(")))))))))))))))))))))))))))))))))))))");
+    // console.log(")))))))))))))))))))))))))))))))))))))");
+    // console.log(")))))))))))))))))))))))))))))))))))))");
+    // console.log(")))))))))))))))))))))))))))))))))))))");
+    // console.log("Field 0 (ID):", result[0].toString());
+    // console.log("Field 8 (Claimed):", result[8]);
+    // console.log("Field 9 (Context):", result[9]); // If it crashes here, index 9/10 is the issue.
+
+    // If your struct includes token address, you can extract it
+    // const tokenAddress = result.token ?? result[2];
+    // console.log("Campaign token:", tokenAddress);
+
+    return result;
+  } catch (err: any) {
     response_message({
-      message: err?.reason || err?.message || "Something went wrong?",
+      message: Wallet_Error_Message(err),
       option: "err",
     });
     return null;
   }
 }
 
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-export async function Refund_Campaign({ id }: { id: number }) {
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Create_Campaign({
+  currencyType,
+  token,
+  goal,
+  durationDays, // Changed from durationInDays
+  milestoneNames,
+  milestoneBps, // Changed from milestoneAmounts
+  contextData = "", // New field from screenshot
+  offchainId = "", // New field from screenshot
+  wallet,
+}: {
+  currencyType: number;
+  token: string;
+  goal: number;
+  durationDays: number;
+  milestoneNames: Array<string>;
+  milestoneBps: Array<number>;
+  contextData: string;
+  offchainId: string;
+  wallet: any;
+}) {
+  const goal_ = ethers.parseUnits(String(goal), 6); // example: 100 tokens = 100000000
+
+  const body = {
+    currencyType,
+    token,
+    goal: goal_,
+    durationDays,
+    milestoneNames,
+    milestoneBps,
+    contextData,
+    offchainId,
+  };
+
+  console.log("====================================");
+  console.log("====================================");
+  console.log("====================================");
+  console.log("====================================");
+  console.log("====================================");
+  console.log(body);
+  console.log("====================================");
+
   try {
     const result = await callContractFunction(
-      "refund",
-      [id],
-      false // 👈 write operation → signer required
+      "createCampaign",
+      [body],
+      false, // 🚨 must be false => use signer
+      wallet,
+    );
+
+    return { status: true, result: result };
+  } catch (err: any) {
+    console.log("Pledge_Token error:", err);
+    return { status: false, error: Wallet_Error_Message(err) };
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Withdraw_Milestone({
+  id,
+  index,
+  wallet,
+}: {
+  id: number;
+  index: number;
+  wallet: any;
+}) {
+  try {
+    const result = await callContractFunction(
+      "withdrawMilestone",
+      [id, index],
+      false, // 👈 write operation
+      wallet,
+    );
+
+    return { status: true, result: result };
+  } catch (err: any) {
+    console.log("Pledge_Token error:", err);
+    return { status: false, error: Wallet_Error_Message(err) };
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Pledge_Token({
+  id,
+  grossAmount,
+  tipAmount,
+  token,
+  wallet,
+}: {
+  id: number;
+  grossAmount: number;
+  tipAmount: number;
+  token: string;
+  wallet: any;
+}) {
+  try {
+    // 1. Get the contract instance (this handles the chain switching for you)
+    const contract = await connectToContract(true, wallet);
+    const signer = contract.runner as ethers.Signer;
+    const provider = signer.provider as ethers.Provider;
+
+    // 2. Use the SAME signer/provider for the Token Contract
+    const erc20 = new ethers.Contract(token, erc20ABI, signer);
+    const decimals = await erc20.decimals();
+
+    const grossAmount_ = ethers.parseUnits(String(grossAmount), decimals);
+    const tipAmount_ = ethers.parseUnits(String(tipAmount), decimals);
+    const totalNeeded = grossAmount_ + tipAmount_;
+
+    // 3. Allowance Check
+    const account = await signer.getAddress();
+    const allowance = await erc20.allowance(account, CONTRACT_ADDRESS);
+
+    if (allowance < totalNeeded) {
+      response_message({ message: "Approving tokens...", option: "wrn" });
+      const gasOverrides = await Get_Gas_Overrides(provider);
+      const approveTx = await erc20.approve(
+        CONTRACT_ADDRESS,
+        totalNeeded,
+        gasOverrides,
+      );
+      await approveTx.wait();
+    }
+
+    // 4. Call the contract using the same function we already fixed
+    const result = await callContractFunction(
+      "pledgeToken",
+      [BigInt(id), grossAmount_, tipAmount_],
+      false,
+      wallet,
     );
 
     return { status: true, result };
   } catch (err: any) {
-    response_message({
-      message: err?.reason || err?.message || "Something went wrong?",
-      option: "err",
-    });
-
-    console.log("Refund_Campaign error:", err);
-    return { status: false, error: err };
+    console.error("Pledge Error:", err);
+    return { status: false, error: Wallet_Error_Message(err) };
   }
 }
 
-// ------------------------------------------------------------------- [  ]
-// ------------------------------------------------------------------- [  ]
-
-const provider = new ethers.JsonRpcProvider("https://polygon-rpc.com");
-
-// Optional — static MATIC/USD rate or fetch dynamically
-const MATIC_TO_USD = 0.75; // or fetch from CoinGecko API
-
-export async function Get_Transaction_Details(txHash: string) {
-  const tx = await provider.getTransaction(txHash);
-  const receipt = await provider.getTransactionReceipt(txHash);
-  if (!tx || !receipt) throw new Error("Transaction not found");
-
-  let type = "unknown";
-  let tokenName = null;
-  let tokenSymbol = null;
-  let amount = 0;
-  let recipient: string | null = null;
-  let decimals = 18;
-  let tokenAddress = null;
-
-  // 🧱 Case 1: Contract creation
-  if (!tx.to) {
-    type = "campaign_creation";
-  }
-
-  // 🪙 Case 2: Native MATIC transfer
-  else if (tx.data === "0x" && tx.value && tx.value > 0n) {
-    type = "matic_transfer";
-    amount = Number(ethers.formatEther(tx.value));
-    recipient = tx.to;
-    tokenName = "Polygon";
-    tokenSymbol = "MATIC";
-  }
-
-  // 💰 Case 3: ERC-20 transfer (check logs)
-  else {
-    type = "token_transfer";
-
-    const transferTopic = ethers.id("Transfer(address,address,uint256)");
-
-    const tokenTransferLog = receipt.logs.find(
-      (log) => log.topics[0] === transferTopic
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Refund_Campaign({
+  id,
+  wallet,
+}: {
+  id: number;
+  wallet: any;
+}) {
+  try {
+    const result = await callContractFunction(
+      "claimRefund",
+      [id],
+      false, // 👈 write operation → signer required
+      wallet,
     );
 
-    if (tokenTransferLog) {
-      try {
-        const tokenContract = new ethers.Contract(
-          tokenTransferLog.address,
-          [
-            "event Transfer(address indexed from, address indexed to, uint256 value)",
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function decimals() view returns (uint8)",
-          ],
-          provider
-        );
-
-        const decoded = tokenContract.interface.decodeEventLog(
-          "Transfer",
-          tokenTransferLog.data,
-          tokenTransferLog.topics
-        );
-
-        recipient = decoded.to;
-        tokenAddress = tokenTransferLog.address;
-
-        // 🧠 Safely fetch decimals (default to 18 if it fails)
-        try {
-          decimals = await tokenContract.decimals();
-        } catch {
-          decimals = 18;
-        }
-
-        tokenName = await tokenContract.name().catch(() => null);
-        tokenSymbol = await tokenContract.symbol().catch(() => null);
-
-        // 🧮 Correct amount formatting
-        amount = parseFloat(ethers.formatUnits(decoded.value, decimals));
-      } catch (e) {
-        console.warn("ERC-20 decode failed:", e);
-      }
-    }
+    return { status: true, result };
+  } catch (err: any) {
+    console.log("Refund_Campaign error:", err.message);
+    return { status: false, error: Wallet_Error_Message(err) };
   }
+}
 
-  // 🧩 Case 4: Campaign creation via factory event
-  if (type === "unknown" || type === "token_transfer") {
-    const factoryTopic = ethers.id("CampaignCreated(uint256,address,address)");
-    const factoryLog = receipt.logs.find(
-      (log) => log.topics[0] === factoryTopic
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Finalize_Campaign({
+  id,
+  wallet,
+}: {
+  id: number;
+  wallet: any;
+}) {
+  try {
+    if (!wallet) throw new Error("Wallet not connected");
+
+    // This uses the helper we already built that handles switching to Chain 137 or 80002
+    const result = await callContractFunction(
+      "finalize", // The name from your screenshot
+      [BigInt(id)],
+      false, // Is not a view function
+      wallet,
     );
 
-    if (factoryLog) {
-      type = "campaign_creation";
-      try {
-        const iface = new ethers.Interface([
-          "event CampaignCreated(uint256 id, address campaignAddress, address creator)",
-        ]);
-        const decoded = iface.decodeEventLog(
-          "CampaignCreated",
-          factoryLog.data,
-          factoryLog.topics
-        );
-
-        recipient = decoded.campaignAddress; // ✅ The deployed campaign contract
-      } catch (e) {
-        console.warn("Failed to decode CampaignCreated:", e);
-      }
-    }
+    return { status: true, result };
+  } catch (err: any) {
+    console.error("Finalize Error:", err);
+    return { status: false, error: Wallet_Error_Message(err) };
   }
+}
 
-  // ⚙️ Gas fee
-  const gasUsed = receipt.gasUsed ?? 0n;
-  const gasPrice = tx.gasPrice ?? 0n;
-  const gasFeeWei = gasUsed * gasPrice;
-  const gasFeeMatic = Number(ethers.formatEther(gasFeeWei));
-  const gasFeeUsd = Number((gasFeeMatic * MATIC_TO_USD).toFixed(4));
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+// ----------------------------------------------------------------------------------------------------------- [  ]
+export async function Donate_To_Treasury(
+  tokenAddress: string,
+  to: string,
+  amount: string,
+  currency: string,
+  wallet: any,
+) {
+  try {
+    if (!wallet)
+      return response_message({ message: "Connect wallet", option: "wrn" });
 
-  // 🕒 Timestamp
-  let timestamp = null;
-  const block = receipt.blockNumber
-    ? await provider.getBlock(receipt.blockNumber)
-    : null;
-  if (block) timestamp = new Date(block.timestamp * 1000).toISOString();
+    // 2. Ensure the wallet is actually on Amoy
+    await ensureCorrectNetwork(wallet);
 
-  return {
-    type,
-    from: tx.from,
-    to: recipient,
-    tokenAddress,
-    blockNumber: receipt.blockNumber,
-    amount,
-    tokenName,
-    tokenSymbol,
-    status: receipt.status === 1 ? "success" : "failed",
-    gasUsed: Number(gasUsed),
-    gasPriceGwei: ethers.formatUnits(gasPrice, "gwei") + " Gwei",
-    gasFeeMatic,
-    gasFeeUsd,
-    timestamp,
-    explorerUrl: `https://polygonscan.com/tx/${txHash}`,
-  };
+    // 3. Normalize the token address (Fixes potential 0x return issues)
+    const checksummedToken = ethers.getAddress(tokenAddress);
+    const checksummedRecipient = ethers.getAddress(to);
+
+    const eip1193Provider = await wallet.getEthereumProvider();
+
+    // 4. CRITICAL: Pass 'network' to the BrowserProvider constructor
+    // This prevents ethers from probing for the network and failing
+    const provider = new ethers.BrowserProvider(eip1193Provider, NETWORK);
+    const signer = await provider.getSigner();
+
+    // 5. Connect Contract with the validated signer
+    const token = new ethers.Contract(checksummedToken, Treasury_ABI, signer);
+
+    console.log(`Checking decimals for ${currency} at ${checksummedToken}...`);
+
+    // If this still fails, the address provided is NOT a contract on Amoy
+    const decimals = await token.decimals();
+    const parsedAmount = ethers.parseUnits(amount, decimals);
+
+    const from = await signer.getAddress();
+    const balance = await token.balanceOf(from);
+
+    if (balance < parsedAmount) {
+      response_message({
+        message: `Insufficient balance. You have ${ethers.formatUnits(balance, decimals)} ${currency}.`,
+        option: "err",
+      });
+      return { status: false };
+    }
+
+    response_message({
+      message: `Sending ${amount} ${currency}...`,
+      option: "wrn",
+    });
+
+    // 🟢 Get the overrides (will be {} on Mainnet)
+    const gasOverrides = await Get_Gas_Overrides(provider);
+
+    // 🟢 Pass the overrides as the last argument
+    const tx = await token.transfer(
+      checksummedRecipient,
+      parsedAmount,
+      gasOverrides,
+    );
+    const receipt = await tx.wait();
+
+    response_message({ message: `Transfer successful!`, option: "scc" });
+    return { status: true, data: receipt };
+  } catch (err: any) {
+    console.error("Detailed Send_ERC20 Error:", err);
+    response_message({ message: Wallet_Error_Message(err), option: "err" });
+
+    return { status: false, error: err };
+  }
 }

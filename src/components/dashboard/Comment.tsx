@@ -15,20 +15,24 @@ import { format_date, response_message } from "../utilities/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-function Campaign({
+function CommentComponent({
   id,
   link,
+  date = null,
   index,
   heading,
+  dashboard = true,
   loading,
   paragraph,
   editComment,
 }: {
   id: string;
+  date?: string | null;
   link: string;
   index: number;
-  heading: string;
+  dashboard?: boolean;
   loading: boolean;
+  heading: string;
   paragraph: string;
   editComment: (index: number) => void;
 }) {
@@ -108,65 +112,90 @@ function Campaign({
         </div>
       )}
 
-      {loading === false ? (
-        <>
-          <div className="relative border-2 border-[#6b6b6b]/10 rounded-md p-5">
-            {organization === false && open === true && (
-              <div className="absolute top-0 left-0 w-full h-full bg-black/5"></div>
-            )}
+      <div
+        className={`rounded-4xl shadow-md ${dashboard === true ? "border-gray-100" : "bg-white"}`}
+      >
+        {loading === false ? (
+          <>
+            <div className="relative rounded-md p-5">
+              {dashboard === true && (
+                <>
+                  {organization === false && open === true && (
+                    <div className="absolute top-0 left-0 rounded-4xl w-full h-full bg-black/5"></div>
+                  )}
 
-            <FaQuoteLeft className="text-[2rem]" />
-            <p className="my-5">{paragraph}</p>
-
-            <div className="flex justify-between items-center gap-3">
-              <h1 className="font-semibold text-xl capitalize">{heading}</h1>
-
-              {organization === false && (
-                <div className="relative bg-gray-100 rounded-md">
-                  <div
-                    onClick={() => setOpen((prev) => !prev)}
-                    className="bg-gray-200 border-3 border-[#fcfcfc] rounded-md cursor-pointer px-3"
-                  >
-                    <MdMoreHoriz className="text-[1.5rem]" />
-                  </div>
-
-                  {open === true && (
-                    <div className="absolute right-0 top-0 translate-y-[calc(-100%-0.5rem)] w-[6.6rem] rounded-md overflow-hidden flex items-center justify-between bg-[#ffffff] border-r-2 border-[#0000000a]/50 p-2">
-                      <Link
-                        href={link || "#"}
-                        className="bg-gray-200 border border-gray-400/60 text-gray-950 text-[1.2rem] rounded-md cursor-pointer p-[0.60rem]"
-                      >
-                        <MdEditSquare />
-                      </Link>
-
+                  {organization === false && (
+                    <div className="relative flex justify-end rounded-md">
                       <div
-                        onClick={() => setOpenDelete((prev) => !prev)}
-                        className="bg-red-100 border border-red-300/60 text-red-700 text-[1.0rem] rounded-md cursor-pointer p-[0.7rem]"
+                        onClick={() => setOpen((prev) => !prev)}
+                        className="border-3 border-[#fcfcfc] rounded-md cursor-pointer px-3"
                       >
-                        <FaTrashAlt />
+                        <MdMoreHoriz className="text-[1.5rem]" />
                       </div>
+
+                      {open === true && (
+                        <div className="absolute right-0 top-0 translate-y-[calc(100%-0.5rem)] w-[6.6rem] rounded-md overflow-hidden flex items-center justify-between bg-[#ffffff] border-r-2 border-[#0000000a]/50 p-2">
+                          <Link
+                            href={link || "#"}
+                            className="bg-gray-200 border border-gray-400/60 text-gray-950 text-[1.2rem] rounded-md cursor-pointer p-[0.60rem]"
+                          >
+                            <MdEditSquare />
+                          </Link>
+
+                          <div
+                            onClick={() => setOpenDelete((prev) => !prev)}
+                            className="bg-red-100 border border-red-300/60 text-red-700 text-[1.0rem] rounded-md cursor-pointer p-[0.7rem]"
+                          >
+                            <FaTrashAlt />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
+                </>
               )}
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="relative">
-            <div className="h-[15rem] relative bg-gray-100 rounded-md loading_ [--delay:0.5s]"></div>
 
-            <div className="flex flex-col relative gap-3 mt-5">
-              <div className="h-[2.5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.6s]"></div>
-              <div className="h-[5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.4s]"></div>
-              <div className="h-[2.5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.5s]"></div>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 bg-[#33b2ba] rounded-full flex justify-center items-center">
+                  <FaQuoteLeft className="text-[2rem] text-white" />
+                </div>
+
+                <div className="">
+                  <h1 className="font-semibold text-xl capitalize">
+                    {heading}
+                  </h1>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 flex items-center">
+                      <MdDateRange className="text-[1.3rem] opacity-50" />
+                    </div>
+                    <p className="text-sm">
+                      {format_date(
+                        date === null ? new Date() : new Date(date as string),
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="my-5">{paragraph}</p>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        ) : (
+          <>
+            <div className="relative">
+              <div className="h-[15rem] relative bg-gray-100 rounded-md loading_ [--delay:0.5s]"></div>
+
+              <div className="flex flex-col relative gap-3 mt-5">
+                <div className="h-[2.5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.6s]"></div>
+                <div className="h-[5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.4s]"></div>
+                <div className="h-[2.5rem] relative bg-gray-100 rounded-md loading_ [--delay:0.5s]"></div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-export default Campaign;
+export default CommentComponent;

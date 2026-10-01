@@ -5,9 +5,11 @@ import {
   get_time_ago,
   response_message,
 } from "@/components/utilities/utils";
+import { NavigationTemplate } from "@/components/utilities/utils.template";
 import { useGetTransactionHistoryMutation } from "@/redux/api/main";
 import Link from "next/link";
 import { useEffect } from "react";
+import { FaCoins } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
 
 export default function Home() {
@@ -35,36 +37,46 @@ export default function Home() {
 
   return (
     <div className="px-5 sm:px-10">
-      <h1 className="font-semibold text-xl mb-2">Transaction History</h1>
+      <NavigationTemplate
+        title="Transaction History"
+        navigation={[
+          { title: "Dashboard", path: "/dashboard" },
+          { title: "Transaction History", path: "#" },
+        ]}
+      />
 
       <div className="relative grid grid-cols-1 gap-5 mt-5">
         {data
           ? data?.map((transaction: any, index: number) => (
               <Link
                 key={index}
-                href={`/dashboard/transactions/overview?harsh=${transaction?.tx_hash}&data=${transaction?.created_at}&event=${transaction?.event}`}
-                className="bg-gray-100 rounded-md flex flex-wrap items-center justify-between gap-5 p-5"
+                href={`/dashboard/transactions/overview?harsh=${transaction?.tx_hash}&date=${transaction?.created_at}&event=${transaction?.event}`}
+                className="bg-gray-100 rounded-xl flex flex-wrap items-center justify-between gap-5 p-5"
               >
-                <div className="flex items-center">
+                <div className="flex items-center gap-5">
+                  <div className="min-w-20 min-h-20 w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">
+                    <FaCoins className="text-[2.5rem] text-white" />
+                  </div>
+
+                  <div className="">
+                    <h1 className="font-semibold">
+                      {transaction?.event || "..."}
+                    </h1>
+
+                    <p className="sm:w-[40%] line-clamp-1 wrap-anywhere">
+                      {transaction?.tx_hash}
+                    </p>
+                  </div>
+                </div>
+
+                {/* <div className="flex items-center">
                   <div className="w-6 h-6 flex items-center">
                     <MdDateRange className="text-[1.3rem]" />
                   </div>
                   <p className="text-sm">
                     {get_time_ago(transaction?.created_at || 0)}
                   </p>
-                </div>
-
-                <div className="sm:w-[40%] lg:w-[20%] flex items-center gap-5">
-                  <p className="px-5 py-1 text-sm bg-[#33b2ba]/10 text-[#144447] border-1 border-[#33b2ba]/15 rounded-lg">
-                    {transaction?.event || "..."}
-                  </p>
-
-                  <div className="w-full">
-                    <p className="line-clamp-1 wrap-anywhere">
-                      {transaction?.tx_hash}
-                    </p>
-                  </div>
-                </div>
+                </div> */}
               </Link>
             ))
           : [

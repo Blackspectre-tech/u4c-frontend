@@ -92,7 +92,7 @@ function Treasury() {
   };
 
   return (
-    <div className="relative p-5 sm:p-20 mt-[5rem] text-center bg-amber-5">
+    <div className="relative p-5 sm:p-20 mt-20 text-center bg-amber-5">
       <h1 className="font-semibold text-3xl mb-3">
         Treasury, 100% transparent.
       </h1>
@@ -109,7 +109,7 @@ function Treasury() {
             key={index}
             className="relative flex items-center gap-5 bg-gray-100 rounded-lg p-5"
           >
-            {/* <div className="min-w-[0.5rem] min-h-[0.5rem] rounded-full bg-[#812880]"></div> */}
+            {/* <div className="min-w-2 min-h-2 rounded-full bg-[#812880]"></div> */}
 
             <div className="">
               <div className="flex items-center gap-2">
@@ -124,10 +124,10 @@ function Treasury() {
       </div>
 
       <div className="flex flex-col items-center justify-center lg:justify-start gap-3 mt-10">
-        {/* <div className="w-4 h-[2px] bg-gray-400"></div> */}
+        {/* <div className="w-4 h-0.5 bg-gray-400"></div> */}
         <Link href={"/in-app-donation"}>
-          <button className={`button_border_ rounded-lg`}>
-            <p className="hover:bg-gray-100 rounded-lg px-7 py-3">
+          <button className={`gradient-cto rounded-lg`}>
+            <p className="text-white rounded-lg px-7 py-3">
               Donate To Treasury
             </p>
           </button>
@@ -144,8 +144,8 @@ function Treasury() {
         </Link>
       </div>
 
-      <div className="flex justify-center items-center mt-[2.5rem] md:mt-[5rem]">
-        <div className="h-[30rem] lg:h-[27rem]">
+      <div className="flex justify-center items-center mt-10 md:mt-20">
+        <div className="md:h-140">
           <PieChart data={chartData} title="" />
         </div>
       </div>

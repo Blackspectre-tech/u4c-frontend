@@ -18,15 +18,18 @@ import CampaignChart from "../CampaignChart";
 import { useRouter } from "next/navigation";
 import { SiHiveBlockchain } from "react-icons/si";
 import Pagination from "@/components/Pagination";
+import { NavigationTemplate } from "@/components/utilities/utils.template";
+import CustomSelector from "@/components/SelectTag";
+import { get_time_expiry } from "@/components/utilities/utils";
 
 function Campaign() {
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, wallet_type } = useSelector((state: RootState) => state.user);
 
   const [params, setParams] = useState({
     categories__name: "",
     search: "",
     status: "",
-    size: 20,
+    size: 13,
     page: 1,
   });
 
@@ -48,97 +51,115 @@ function Campaign() {
     })();
 
     return () => {};
-  }, []);
+  }, [params]);
 
   console.log("====================================");
   console.log(data);
-  //   console.log(isLoading);
   console.log("====================================");
 
-  // const editCategory = async (value: string) => {
-  //   if (value === "All Categories")
-  //     setParams((prev) => ({ ...prev, categories__name: "" }));
-  //   else setParams((prev) => ({ ...prev, categories__name: value }));
-
-  //   await refetch();
-  // };
-
-  const editCategory = async (value: string) => {
-    if (value === "All Categories")
-      setParams((prev) => ({ ...prev, categories__name: "" }));
-    else setParams((prev) => ({ ...prev, categories__name: value }));
-
-    await refetch();
-  };
-
-  const editStatus = async (value: string) => {
-    if (value === "All Status") setParams((prev) => ({ ...prev, status: "" }));
-    else setParams((prev) => ({ ...prev, status: value }));
-
-    await refetch();
-  };
-
-  const editSearch = async (value: string) => {
-    setParams((prev) => ({ ...prev, search: value }));
-    await refetch();
-  };
+  const campaign_status = ["All", "Failed", "Completed"];
 
   return (
     <div className="">
-      <div className="flex flex-col xl:grid md:grid-cols-10 gap-5">
-        <div className="w-full h-full col-span-6 xl:col-span-7 overflow-hidden object-center bg-[url('https://images.unsplash.com/photo-1740568439252-b060d7ff3437?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Ds')] rounded-lg">
-          <div className="w-full max-h-[24rem] h-[20rem] md:min-h-[24rem] bg-[linear-gradient(90deg,#812880a1,#eb2027e1)] p-4">
-            <CampaignChart />
+      <NavigationTemplate
+        title="Campaigns"
+        navigation={[
+          { title: "Dashboard", path: "/dashboard" },
+          { title: "Campaigns", path: "#" },
+        ]}
+      />
+
+      <div className="mt-5 w-full h-full bg-gray-100 rounded-4xl flex flex-wrap justify-between gap-10 p-7">
+        <Insight
+          colorTint={"bg-[#FFD3BA]"}
+          icon={<BsShieldFillCheck className="text-[#9C4617]" />}
+          value={user?.approved_projects}
+          description={"Approved Campaign"}
+        />
+
+        <Insight
+          colorTint={"bg-[#A6FAFF]"}
+          icon={<RiFileList3Fill className="text-[#1D6166]" />}
+          value={user?.total_projects}
+          description={"Campaigns"}
+        />
+
+        <Insight
+          colorTint={"bg-[#FF8FFC]"}
+          icon={<SiHiveBlockchain className="text-[#822580]" />}
+          value={user?.onchain_projects}
+          description={"Published Campaigns"}
+        />
+
+        <Insight
+          colorTint={"bg-[#FFE6A3]"}
+          icon={<SiHiveBlockchain className="text-[#A2790C]" />}
+          value={"0"}
+          description={"Completed Campaigns"}
+        />
+
+        {/* <Insight
+          colorTint={"bg-[#FFD3DA]"}
+          icon={<SiHiveBlockchain className="text-[#A9190C]" />}
+          value={"0"}
+          description={"UnCompleted Campaigns"}
+        /> */}
+      </div>
+
+      <div className="mt-20">
+        <div className="flex flex-wrap justify-between items-center gap-5">
+          <h1 className="font-bold text-xl md:text-2xl mb-2">All Campaign</h1>
+
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="w-52 flex items-center gap-3 bg-gray-200 rounded-full">
+              <CustomSelector
+                // optionsList={["USDT", "USDC", "Fiat VIA Transak/Card"]}
+                control_class={"w-full"}
+                control_style={{
+                  // borderRadius: "0.5rem",
+                  border: "none",
+                  padding: "0.35rem 0.75rem",
+                  backgroundColor: "",
+                  outline: "0",
+                  stroke: "0",
+                  width: "100%",
+                  flex: 1,
+                }}
+                optionsList={campaign_status}
+                placeholder="All"
+                changeEvent={(selected) => {
+                  if (!selected) return;
+
+                  if ((selected?.value as string) === "All")
+                    setParams((prev) => ({ ...prev, status: "" }));
+                  else
+                    setParams((prev) => ({
+                      ...prev,
+                      status: selected?.value as string,
+                    }));
+                }}
+                mapOption={(val) => ({
+                  value: val,
+                  name: val,
+                  label: (
+                    <div className="flex items-center">
+                      <p>{val}</p>
+                    </div>
+                  ),
+                })}
+              />
+            </div>
+
+            <Link
+              href={"/dashboard/campaign/add"}
+              className="gradient-cto rounded-full flex items-center gap-2 py-2 md:py-3 px-5"
+            >
+              <TbPlus /> <p className="">Add Campaign</p>
+            </Link>
           </div>
         </div>
 
-        <div className="w-full h-full xl:col-span-3 flex flex-col md:grid grid-cols-3 xl:grid-cols-1 gap-5">
-          <Insight
-            icon={<BsShieldFillCheck />}
-            value={user?.approved_projects}
-            description={"Total Approved Projects"}
-          />
-
-          <Insight
-            icon={<RiFileList3Fill />}
-            value={user?.total_projects}
-            description={"Total Projects"}
-          />
-
-          <Insight
-            icon={<SiHiveBlockchain />}
-            value={user?.onchain_projects}
-            description={"Total Published Project"}
-          />
-        </div>
-      </div>
-
-      <div className="mt-[5rem]">
-        <div className="flex justify-between items-center">
-          <h1 className="font-bold text-xl md:text-2xl mb-2">All Campaign</h1>
-
-          <Link
-            href={"/dashboard/campaign/add"}
-            className="text-[#381237] font-bold cursor-pointer text-[1.3rem] md:text-[1.5rem]
-             rounded-lg md:rounded-xl border-[2px] border-transparent
-             [background:linear-gradient(#fcfcfc,#fcfcfc)_padding-box,linear-gradient(90deg,#812880,#eb2027)_border-box] overflow-hidden"
-          >
-            <div className="hover:bg-[#812880]/5 p-2 md:p-3">
-              <TbPlus />
-            </div>
-          </Link>
-        </div>
-
-        <div className="py-7 md:py-10">
-          <ExploreFilter
-            category={editCategory}
-            status={editStatus}
-            search={editSearch}
-            search_value={params.search}
-          />
-        </div>
-
-        <div className="flex flex-col min-[800]:grid grid-cols-2 min-[1450]:grid-cols-3 gap-5 mt-8 ">
+        <div className="flex flex-col md:grid grid-cols-2 xl:grid-cols-3 gap-5 mt-8">
           {isLoading
             ? [1, 2, 3, 5].map((campaign, index) => (
                 <div key={index} className="">
@@ -151,7 +172,17 @@ function Campaign() {
                 </div>
               ))
             : data?.results.map((campaign: any, index: number) => (
-                <div key={index} className="">
+                <div
+                  key={index}
+                  className={
+                    params.status === "Funding"
+                      ? `${
+                          get_time_expiry(campaign?.deadline) === "0" &&
+                          "hidden"
+                        }`
+                      : ""
+                  }
+                >
                   <CampaignCard
                     donate={false}
                     loading={false}
@@ -174,6 +205,7 @@ function Campaign() {
                         : "#"
                     }
                     date={campaign?.created_at || null}
+                    sadaqah={campaign?.sadaqah === true}
                   />
                 </div>
               ))}
@@ -183,14 +215,18 @@ function Campaign() {
           {isLoading === false && !(data?.results?.length > 0) && (
             <div className="bg-[#0000000a]/30 border-2 border-[#0000000a]/70 rounded-lg flex flex-col justify-center items-center p-10">
               <RiFileForbidFill className="text-[3rem] font text-black/30 mb-3" />
-              <p>You do not have any active campaigns</p>
+              {wallet_type === "pending" ? (
+                <p>Kindly connect your wallet to view active campaigns</p>
+              ) : (
+                <p>You do not have any active campaigns</p>
+              )}
             </div>
           )}
         </div>
 
         <Pagination
           data={data}
-          count={6}
+          count={13}
           params={params}
           setParams={setParams}
         />

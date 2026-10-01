@@ -12,7 +12,7 @@ import {
 } from "react-icons/pi";
 
 export default function Home() {
-  const [params, setParams] = useState({ category: "" });
+  const [params, setParams] = useState({ category: "General Overview" });
   const { isLoading, data, refetch, error } = useGetFaqsQuery(
     {
       params: params, // ✅ object, not string
@@ -21,10 +21,11 @@ export default function Home() {
       // pollingInterval: 10000, // every 10 seconds
       // refetchOnFocus: true,
       // refetchOnReconnect: true,
-    }
+    },
   );
 
   console.log("====================================");
+  console.log("FAQs");
   console.log(data);
   console.log("====================================");
 
@@ -35,62 +36,75 @@ export default function Home() {
   return (
     <div className="">
       <Hero
-        heading="Frequently Asked "
-        heading_styled="Questions"
+        // heading="Frequently Asked "
+        // heading_styled="Questions"
+        heading="FAQs"
+        heading_styled=""
         paragraph="We built United4Change to solve the trust problem in charity, by using technology that proves every donation does what it says it will. Giving has never been this transparent or borderless"
       />
-      <div className="relative mt-[10rem]">
-        <div className="grid grid-cols-1 gap-5 px-5 sm:px-10 md:px-20 xl:px-30 mt-[5rem]">
-          <div className="flex flex-col sm:flex-row items-center gap-3 px-5 sm:px-10 xl:px-20 mb-[5rem]">
-            <div className="w-full">
+      <div className="relative mt-40">
+        <div className="mx-auto xl:w-[80%] px-5 sm:px-10 md:px-20 xl:px-30 mt-20">
+          <div className="flex justify-end mb-10">
+            <div
+              data-lenis-prevent
+              className="w-84 flex items-center gap-3 gradient-cto rounded-xl"
+            >
               <CustomSelector
+                // optionsList={["USDT", "USDC", "Fiat VIA Transak/Card"]}
+                control_class={"w-full"}
+                single_value_style={{
+                  color: "#ffffff",
+                }}
+                placeholder_style={{
+                  color: "#ffffff",
+                }}
+                control_style={{
+                  // borderRadius: "0.5rem",
+                  border: "none",
+                  padding: "0.55rem 1rem",
+                  backgroundColor: "",
+                  outline: "0",
+                  stroke: "0",
+                  width: "100%",
+                  flex: 1,
+                }}
                 optionsList={[
-                  "Discover United4Change",
-                  "Global Giving Made Easy",
-                  "Starting A Campaign",
-                  "The Tech That Powers U4C",
+                  "General Overview",
+                  "How Funding Works",
+                  "Donor Protection & Refunds",
+                  "Security & Transparency",
+                  "Treasury & Governance",
+                  "NGOs & Participation",
+                  "Your Donation, Protected",
+                  "Contact & Updates",
                 ]}
-                placeholder="Inquiry type"
+                placeholder="General Overview"
                 changeEvent={(selected) =>
                   editCategory(String(selected?.value ?? ""))
                 }
-                control_class={""}
-                control_style={{
-                  borderRadius: "0.5rem",
-                  padding: "0.85rem 0.75rem",
-                }}
                 mapOption={(val) => ({
                   value: val,
                   name: val,
                   label: (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center text-xl">
                       <p>{val}</p>
                     </div>
                   ),
                 })}
               />
             </div>
-
-            <button
-              onClick={async () => await refetch()}
-              disabled={isLoading}
-              className="button_ cursor-pointer text-[1.2rem] flex items-center justify-center gap-2 w-full sm:w-auto px-10 md:px-[5rem] py-[1.10rem]"
-            >
-              {isLoading && (
-                <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem]" />
-              )}{" "}
-              Submit
-            </button>
           </div>
 
-          {data?.map((faq: any, index: number) => (
-            <Faq
-              key={index}
-              heading={faq?.question || ""}
-              paragraph={faq?.answer || ""}
-              index={index}
-            />
-          ))}
+          <div className="grid grid-cols-1 gap-5">
+            {data?.map((faq: any, index: number) => (
+              <Faq
+                key={index}
+                heading={faq?.question || ""}
+                paragraph={faq?.answer || ""}
+                index={index}
+              />
+            ))}
+          </div>
         </div>
       </div>
       {/* <FAQs faqs={faqs} /> */}

@@ -9,7 +9,11 @@ import { private_endpoints } from "./private.endpoint";
 
 // -------------------------------------------------------------------------------- [  ]
 // ------------------------------------------------------------- [  ]
-const URL = "https://backend.united-4-change.org";
+const URL = (
+  process.env.NEXT_PUBLIC_ENVIRONMENT === "Development"
+    ? process.env.NEXT_PUBLIC_DEV_API_LINK
+    : process.env.NEXT_PUBLIC_PROD_API_LINK
+) as string;
 const axiosJwt = axios.create();
 
 export type AxiosBaseQueryArgs = {
@@ -44,17 +48,10 @@ axiosJwt.interceptors.request.use(async (config) => {
 
     const decoded_token = jwtDecode<Record<string, any>>(token ? token : "");
 
-    console.log("========== [ TOKEN NEEDED ] ============");
-    console.log(decoded_token);
-    console.log(token);
-    console.log("====================================");
-
     if (decoded_token?.exp * 1000 < currentTime?.getTime()) {
       const new_token = await axios.post(`${URL}/account/token/refresh/`, {
         refresh: get_jwt("refresh-token"),
       });
-
-      console.log("[ New Token ]", new_token.data);
 
       if (new_token.data?.access) {
         config.headers["authorization"] = `Bearer ${new_token.data?.access}`;
@@ -72,64 +69,19 @@ axiosJwt.interceptors.request.use(async (config) => {
 
 // -------------------------------------------------------------------------------- [  ]
 // -------------------------------------------------------------------------------- [  ]
-function check_path(path: string, method: string | undefined) {
-  // Matches:
-  //   /projects/123
-  //   /projects/123/
-  //   /projects/organization/4
-  //   /projects/organization/4/
-  const regex = /^\/projects(?:\/organization)?\/\d+\/?$/;
-
-  const result = regex.test(path);
-
-  console.log("========== [ check_path ] ==========");
-  console.log("Path:", path);
-  console.log("Regex Match:", result);
-  console.log("====================================");
-
-  return result && method === "GET";
-}
 
 const axiosBaseQuery =
   ({ baseUrl }: { baseUrl: string } = { baseUrl: "" }): AxiosBaseQuery =>
-  async ({ url, method, body, params }) => {
+  async ({ url, method, body, params, extraData }: any) => {
     const data = body;
     const headers = { value: { "Content-Type": "application/json" } };
 
-    if (
-      url === "/projects/create/" ||
-      url === "/account/upload-avatar/" ||
-      url === "/account/organization/kyc/" ||
-      url === "/account/update-userprofile/" ||
-      url === "/account/update-organization/" ||
-      (url.includes("/projects/") === true && method === "PATCH") ||
-      (url.includes("/projects/milestones/") === true && method === "POST")
-    )
+    // Type Initialization
+    if (extraData?.useMultipart)
       headers.value["Content-Type"] = "multipart/form-data";
 
-    console.log("000000000000000000000000000000000000");
-    console.log(headers);
-    console.log(url);
-    console.log(params);
-    console.log(method);
-    console.log("000000000000000000000000000000000000");
-
     try {
-      if (
-        url === "/projects/" ||
-        url === "/website/faq/" ||
-        url === "/account/token/" ||
-        url === "/account/activate/" ||
-        url === "/website/contact-us/" ||
-        url === "/account/organization/" ||
-        url === "/account/organization/" ||
-        check_path(url, method) === true ||
-        url === "/account/register-user/" ||
-        url === "/account/password-reset/" ||
-        url === "/account/register-organization/" ||
-        url === "/account/resend-activation-otp/" ||
-        url === "/account/confirm-password-reset/"
-      ) {
+      if (extraData?.requireToken === false) {
         const result = await axios({
           url: baseUrl + url,
           method,
@@ -137,10 +89,6 @@ const axiosBaseQuery =
           params,
           headers: headers.value,
         });
-
-        console.log("====================================");
-        console.log("[ NO TOKEN NEEDED ]");
-        console.log("====================================");
 
         return { data: result.data };
       }
@@ -184,8 +132,8 @@ export const api = createApi({
 export const {
   // ----------------------------- [ public ]
   useGetPopularCampaignQuery,
+  useGetStatsQuery,
   useGetProfileMutation,
-  useGetProfileBackgroundTaskQuery,
   useSignInMutation,
   useSignUpDonorMutation,
   useSignUpNgoMutation,
@@ -195,7 +143,15 @@ export const {
   useEditPasswordMutation,
   useContactUsMutation,
   useAddMilestoneImagesMutation,
+  useDeleteMilestoneImagesMutation,
+  useAddUpdateMutation,
+  useGetUpdateMutation,
+  useDeleteUpdateMutation,
+  useAddGalleryImagesMutation,
+  useEditGalleryImageMutation,
+  useDeleteGalleryImageMutation,
   useAddExpensesMutation,
+  useDeleteExpensesMutation,
   useGetFaqsQuery,
 
   // ----------------------------- [ private ]
@@ -217,10 +173,13 @@ export const {
   useGetNgoMutation,
   usePatchNgoMutation,
   useVerifyKycMutation,
+  useGetKycMutation,
   useCreateCampaignMutation,
   useDeleteCampaignMutation,
   usePatchCampaignMutation,
   useGetCampaignNgoMutation,
   useGetNgoPublicMutation,
   useGetNgoCampaignMutation,
+  useGetDonationsMutation,
+  useGetCommentsMutation,
 } = api;

@@ -5,6 +5,7 @@ type Params_Type = {
   categories__name: string;
   search: string;
   status: string;
+  sadaqah?: boolean;
   size: number;
   page: number;
 };

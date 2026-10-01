@@ -3,9 +3,6 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 // Fix for missing marker icons
 // @ts-ignore
@@ -39,11 +36,33 @@ function SearchAndDisplay({ query }: { query: string }) {
   return null;
 }
 
+// Wheel zoom is off by default so the page can scroll past the map. It turns on
+// after the map is clicked and off again when the cursor leaves.
+function WheelZoomOnClick() {
+  const map = useMap();
+
+  useEffect(() => {
+    const enable = () => map.scrollWheelZoom.enable();
+    const disable = () => map.scrollWheelZoom.disable();
+
+    map.on("click", enable);
+    map.on("mouseout", disable);
+
+    return () => {
+      map.off("click", enable);
+      map.off("mouseout", disable);
+    };
+  }, [map]);
+
+  return null;
+}
+
 export default function LocationMap({ country }: LocationMapProps) {
   return (
     <MapContainer
       center={[0, 0]} // temporary center before geocode resolves
       zoom={2}
+      scrollWheelZoom={false}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
@@ -51,6 +70,7 @@ export default function LocationMap({ country }: LocationMapProps) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
       <SearchAndDisplay query={country} />
+      <WheelZoomOnClick />
     </MapContainer>
   );
 }
