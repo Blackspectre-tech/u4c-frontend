@@ -8,11 +8,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import {
   MdDeleteForever,
   MdEditSquare,
   MdOutlineDeleteForever,
+  MdOutlineZoomOutMap,
 } from "react-icons/md";
 import { PiEmptyBold } from "react-icons/pi";
 import { useSelector } from "react-redux";
@@ -41,13 +43,12 @@ function GalleryComponent({
 }) {
   const { organization } = useSelector((state: RootState) => state.user);
   const [openDelete, setOpenDelete] = useState(false);
+  const [viewAll, setViewAll] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [images, setImages] = useState<ImageEntry[]>(() => get_images(data));
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  console.log("[ Action ]: ", action);
   const [Delete_Gallery_Image] = useDeleteGalleryImageMutation();
-  if (!(get_images(data).length > 0)) return <></>;
 
   // Keep the local, editable image list in sync whenever the campaign data
   // this card was built from is refetched.
@@ -55,6 +56,24 @@ function GalleryComponent({
     setImages(get_images(data));
     setActiveImage(0);
   }, [data]);
+
+  // Keyboard support for the big view: left/right to browse, escape to close.
+  useEffect(() => {
+    if (viewAll === false) return;
+
+    const on_key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setViewAll(false);
+      if (e.key === "ArrowRight")
+        setActiveImage((prev) => (prev + 1) % Math.max(images.length, 1));
+      if (e.key === "ArrowLeft")
+        setActiveImage(
+          (prev) => (prev - 1 + images.length) % Math.max(images.length, 1),
+        );
+    };
+
+    window.addEventListener("keydown", on_key);
+    return () => window.removeEventListener("keydown", on_key);
+  }, [viewAll, images.length]);
 
   // Deletes a single evidence image (the milestone/card itself is never
   // removed from here).
@@ -92,8 +111,95 @@ function GalleryComponent({
     });
   };
 
+  const show_next = () =>
+    setActiveImage((prev) => (prev + 1) % Math.max(images.length, 1));
+  const show_prev = () =>
+    setActiveImage(
+      (prev) => (prev - 1 + images.length) % Math.max(images.length, 1),
+    );
+
+  if (images.length === 0) return <></>;
+
   return (
     <div className="relative overflow-hidden rounded-4xl">
+      {viewAll === true &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed top-0 left-0 z-60 w-full h-full bg-black/90 flex flex-col items-center justify-center px-5"
+            onClick={() => setViewAll(false)}
+          >
+            <IoClose
+              onClick={() => setViewAll(false)}
+              className="absolute top-5 right-5 text-[1.8rem] text-white/80 hover:text-white cursor-pointer"
+            />
+
+            <div
+              className="relative w-full max-w-4xl h-[65vh] sm:h-[75vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {images[activeImage]?.image && (
+                <Image
+                  src={images[activeImage].image}
+                  alt=""
+                  className="object-contain"
+                  fill
+                />
+              )}
+
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={show_prev}
+                    aria-label="Previous image"
+                    className="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer"
+                  >
+                    <FaChevronLeft />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={show_next}
+                    aria-label="Next image"
+                    className="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer"
+                  >
+                    <FaChevronRight />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {images.length > 1 && (
+              <div
+                className="flex items-center gap-2 mt-5"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {images.map((img, index) => (
+                  <button
+                    key={img.id || index}
+                    type="button"
+                    onClick={() => setActiveImage(index)}
+                    aria-label={`Show image ${index + 1}`}
+                    className={`rounded-full transition-all cursor-pointer ${
+                      index === activeImage
+                        ? "w-5 h-2 bg-white"
+                        : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {images.length > 1 && (
+              <p className="text-white/70 text-sm mt-3">
+                {activeImage + 1} / {images.length}
+              </p>
+            )}
+          </div>,
+          document.body,
+        )}
+
       {openDelete === true &&
         typeof document !== "undefined" &&
         createPortal(
@@ -190,15 +296,24 @@ function GalleryComponent({
         )}
 
         <div
-          className={`bg-[#0000000a]/60 w-full min-h-50 max-h-50 relative overflow-hidden rounded-4xl border border-black/5 p-5`}
+          onClick={() => images[activeImage]?.image && setViewAll(true)}
+          className={`group bg-[#0000000a]/60 w-full min-h-50 max-h-50 relative overflow-hidden rounded-4xl border border-black/5 p-5 ${
+            images[activeImage]?.image && "cursor-pointer"
+          }`}
         >
           {images[activeImage]?.image ? (
-            <Image
-              src={images[activeImage].image}
-              alt=""
-              className="w-full h-full object-cover"
-              fill
-            />
+            <>
+              <Image
+                src={images[activeImage].image}
+                alt=""
+                className="w-full h-full object-cover"
+                fill
+              />
+
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                <MdOutlineZoomOutMap className="text-white text-[1.6rem] opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400">
               <PiEmptyBold className="text-[1.7rem]" />
