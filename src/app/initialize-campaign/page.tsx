@@ -20,7 +20,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { MdCancel, MdDateRange } from "react-icons/md";
 import { SiHiveBlockchain } from "react-icons/si";
 import { useSelector } from "react-redux";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Milestone from "@/components/dashboard/ngo/Milestone";
 import { useWallets } from "@privy-io/react-auth";
 import { useGetWallet, USDC_ADDRESS } from "@/Wallet/privy/privy.utils";
@@ -333,7 +333,16 @@ export default function Home() {
             </div>
 
             {
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => {
+                    if (swiperInstance1) swiperInstance1.slidePrev();
+                  }}
+                  className="w-13 h-13 border-2 border-white bg-white/10 rounded-full cursor-pointer flex items-center justify-center"
+                >
+                  <FaChevronLeft className="text-[1.5rem] -translate-x-0.5 text-white" />
+                </div>
+
                 <div
                   onClick={() => {
                     if (swiperInstance1) swiperInstance1.slideNext();
@@ -350,7 +359,6 @@ export default function Home() {
               className={`${data?.milestones?.length > 1 ? "w-[190%] lg:w-[120%] min-[1500px]:w-full!" : "w-full"} px-5 mt-5 md:mt-0 md:p-10`}
             >
               <Swiper
-                loop={true}
                 key={
                   data?.milestones?.length > 1
                     ? "layout-populated"

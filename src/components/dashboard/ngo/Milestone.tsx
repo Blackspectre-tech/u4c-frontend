@@ -54,14 +54,14 @@ function Milestone({
     remaining_percentage > 100 ? 100 : remaining_percentage;
   const OWING_PERCENTAGE = 100 - REMAINING_PERCENTAGE;
 
-  console.log("\n\n\n====================================");
-  console.log("milestones");
-  console.log("milestone: ", milestone);
-  console.log("surplus: ", surplus);
-  console.log(
-    "surplus: ",
-    get_percentage(Number(milestone?.surplus || 0), milestone?.milestone_goal),
-  );
+  // console.log("\n\n\n====================================");
+  // console.log("milestones");
+  // console.log("milestone: ", milestone);
+  // console.log("surplus: ", surplus);
+  // console.log(
+  //   "surplus: ",
+  //   get_percentage(Number(milestone?.surplus || 0), milestone?.milestone_goal),
+  // );
   // console.log("goal: ", goal);
   // console.log("surplus: ", surplus);
   // console.log(REMAINING_PERCENTAGE);

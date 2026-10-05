@@ -29,7 +29,7 @@ import { useSelector } from "react-redux";
 import { Navigation } from "swiper/modules";
 import { PiEmptyBold } from "react-icons/pi";
 import PaiChart from "@/components/PaiChart";
-import { FaChevronRight, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { SiHiveBlockchain } from "react-icons/si";
 import { IoClose, IoWallet } from "react-icons/io5";
 import Insight from "@/components/dashboard/Insight";
@@ -1015,13 +1015,24 @@ export default function Home() {
                   </Link>
                 )}
 
-              <div
-                onClick={() => {
-                  if (swiperInstance1) swiperInstance1.slideNext();
-                }}
-                className="w-13 h-13 border-2 border-white bg-white/10 rounded-full cursor-pointer flex items-center justify-center"
-              >
-                <FaChevronRight className="text-[1.5rem] translate-x-0.5 text-white" />
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => {
+                    if (swiperInstance1) swiperInstance1.slidePrev();
+                  }}
+                  className="w-13 h-13 border-2 border-white bg-white/10 rounded-full cursor-pointer flex items-center justify-center"
+                >
+                  <FaChevronLeft className="text-[1.5rem] -translate-x-0.5 text-white" />
+                </div>
+
+                <div
+                  onClick={() => {
+                    if (swiperInstance1) swiperInstance1.slideNext();
+                  }}
+                  className="w-13 h-13 border-2 border-white bg-white/10 rounded-full cursor-pointer flex items-center justify-center"
+                >
+                  <FaChevronRight className="text-[1.5rem] translate-x-0.5 text-white" />
+                </div>
               </div>
             </div>
           </div>
@@ -1032,7 +1043,6 @@ export default function Home() {
             >
               {
                 <Swiper
-                  loop={true}
                   key={style_check ? "layout-populated" : "layout-loading"} // 👈 Forces recalculation
                   onSwiper={(swiper) => setSwiperInstance1(swiper)}
                   speed={500} // how fast the content glides

@@ -152,6 +152,13 @@ export default function Home() {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
+    if (e.target.name === "duration_in_days") {
+      // Only allow a plain positive whole number (no sign, no decimal, no
+      // leading zero) so the duration can never go negative or to zero.
+      const pattern = /^[1-9][0-9]*$/;
+      if (e.target.value !== "" && !pattern.test(e.target.value)) return;
+    }
+
     if (e.target.name === "goal") {
       const value = e.target.value === "" ? "0" : e.target.value;
       console.log("000000: ", !/^(0|[1-9][0-9]*)$/.test(value), " : ", value);
@@ -331,6 +338,12 @@ export default function Home() {
     e.preventDefault();
     const goal = formData.goal;
     const is_icon = selected.type === "icon";
+
+    if (!(Number(formData.duration_in_days) >= 1))
+      return response_message({
+        message: "Duration in days must be at least 1.",
+        option: "wrn",
+      });
 
     const condition =
       total_milestone.current > (is_icon ? 100 : goal) ||
@@ -661,6 +674,8 @@ export default function Home() {
                 <input
                   required
                   type="number"
+                  min={1}
+                  step={1}
                   name="duration_in_days"
                   sub-child={"false"}
                   value={formData.duration_in_days}

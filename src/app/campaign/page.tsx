@@ -732,7 +732,17 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-3">
+                  <div
+                    onClick={() => {
+                      if (swiperInstanceMilestone)
+                        swiperInstanceMilestone.slidePrev();
+                    }}
+                    className="w-13 h-13 border-2 border-white bg-white/10 rounded-full cursor-pointer flex items-center justify-center"
+                  >
+                    <FaChevronLeft className="text-[1.5rem] -translate-x-0.5 text-white" />
+                  </div>
+
                   <div
                     onClick={() => {
                       if (swiperInstanceMilestone)
@@ -753,7 +763,6 @@ export default function Home() {
                     key={style_check ? "layout-populated" : "layout-loading"} // 👈 Forces recalculation
                     onSwiper={(swiper) => setSwiperInstanceMilestone(swiper)}
                     speed={500} // how fast the content glides
-                    loop={true}
                     spaceBetween={20}
                     slidesPerView={3} // 👈 base: mobile first
                     breakpoints={
