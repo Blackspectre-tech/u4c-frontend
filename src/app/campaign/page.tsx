@@ -16,7 +16,7 @@ import {
   useGetDonationsMutation,
   useGetNgoPublicMutation,
   useGetPopularCampaignQuery,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import { Get_Campaign_Details, Pledge_Token } from "@/Wallet/ConnectContract";

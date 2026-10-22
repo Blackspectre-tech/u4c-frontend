@@ -22,7 +22,7 @@ import {
   sadaqahFields,
   zakatFields,
 } from "@/components/dashboard/CampaignFormUI";
-import { useCreateCampaignMutation } from "@/redux/api/main";
+import { useCreateCampaignMutation } from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

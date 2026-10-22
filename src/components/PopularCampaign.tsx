@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Campaign from "./Campaign";
 import gsap from "gsap";
-import { useGetPopularCampaignQuery } from "@/redux/api/main";
+import { useGetPopularCampaignQuery } from "@/redux/api/_main";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import {

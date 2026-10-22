@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetStatsQuery } from "@/redux/api/main";
+import { useGetStatsQuery } from "@/redux/api/_main";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 

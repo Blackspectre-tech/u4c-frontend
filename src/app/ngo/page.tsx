@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   useGetNgoCampaignMutation,
   useGetNgoPublicMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/Pagination";
 import {

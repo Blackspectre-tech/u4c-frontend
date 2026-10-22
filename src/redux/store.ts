@@ -11,7 +11,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import user from "./slice/users";
-import { api } from "./api/main";
+import { api } from "./api/_main";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import type { Storage } from "redux-persist";
 

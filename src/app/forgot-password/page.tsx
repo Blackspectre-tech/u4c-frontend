@@ -1,7 +1,7 @@
 "use client";
 
 import { response_message } from "@/components/utilities/utils";
-import { useForgotPasswordMutation } from "@/redux/api/main";
+import { useForgotPasswordMutation } from "@/redux/api/_main";
 import { setVerifyEmail } from "@/redux/slice/users";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

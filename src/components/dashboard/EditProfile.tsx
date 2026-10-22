@@ -3,7 +3,7 @@
 import {
   usePatchUserMutation,
   useUploadAvatarMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { response_message } from "../utilities/utils";

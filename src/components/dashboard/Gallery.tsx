@@ -1,7 +1,7 @@
 "use client";
 
 import { response_message } from "@/components/utilities/utils";
-import { useDeleteGalleryImageMutation } from "@/redux/api/main";
+import { useDeleteGalleryImageMutation } from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
 import Link from "next/link";

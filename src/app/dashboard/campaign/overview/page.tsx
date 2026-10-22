@@ -13,7 +13,7 @@ import {
   useGetCommentsMutation,
   useGetDonationsMutation,
   useGetUpdateMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import {
   Finalize_Campaign,
   Get_Campaign_Details,
@@ -29,7 +29,12 @@ import { useSelector } from "react-redux";
 import { Navigation } from "swiper/modules";
 import { PiEmptyBold } from "react-icons/pi";
 import PaiChart from "@/components/PaiChart";
-import { FaChevronLeft, FaChevronRight, FaPlus, FaTrashAlt } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaPlus,
+  FaTrashAlt,
+} from "react-icons/fa";
 import { SiHiveBlockchain } from "react-icons/si";
 import { IoClose, IoWallet } from "react-icons/io5";
 import Insight from "@/components/dashboard/Insight";

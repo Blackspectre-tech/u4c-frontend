@@ -8,7 +8,7 @@ import { TbPlus } from "react-icons/tb";
 import {
   useGetCampaignAwaitMutation,
   useGetCampaignQuery,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RiFileForbidFill, RiFileList3Fill } from "react-icons/ri";
 import Insight from "../Insight";
 import { BsShieldFillCheck } from "react-icons/bs";

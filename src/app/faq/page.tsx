@@ -3,7 +3,7 @@
 import Faq from "@/components/Faq";
 import Hero from "@/components/Hero";
 import CustomSelector from "@/components/SelectTag";
-import { useGetFaqsQuery } from "@/redux/api/main";
+import { useGetFaqsQuery } from "@/redux/api/_main";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {

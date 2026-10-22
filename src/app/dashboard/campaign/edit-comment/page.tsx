@@ -6,7 +6,7 @@ import { NavigationTemplate } from "@/components/utilities/utils.template";
 import {
   useGetCommentMutation,
   usePatchCommentMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

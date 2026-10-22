@@ -1,7 +1,7 @@
 "use client";
 
 import { response_message } from "@/components/utilities/utils";
-import { useEditPasswordMutation } from "@/redux/api/main";
+import { useEditPasswordMutation } from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

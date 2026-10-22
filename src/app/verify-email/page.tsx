@@ -4,7 +4,7 @@ import { response_message } from "@/components/utilities/utils";
 import {
   useResendVerificationMutation,
   useVerifyEmailMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

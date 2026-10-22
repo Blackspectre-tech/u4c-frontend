@@ -2,7 +2,7 @@
 
 import CustomSelector from "@/components/SelectTag";
 import { response_message } from "@/components/utilities/utils";
-import { useContactUsMutation } from "@/redux/api/main";
+import { useContactUsMutation } from "@/redux/api/_main";
 import { setVerifyEmail } from "@/redux/slice/users";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";

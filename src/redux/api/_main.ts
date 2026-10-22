@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
 import { ngo_endpoints } from "./ngo.endpoint";
 import { private_endpoints } from "./private.endpoint";
+import { linkio_endpoints } from "./linkio.endpoint";
 
 // -------------------------------------------------------------------------------- [  ]
 // ------------------------------------------------------------- [  ]
@@ -124,6 +125,7 @@ export const api = createApi({
     ...public_endpoints(builder),
     ...private_endpoints(builder),
     ...ngo_endpoints(builder),
+    ...linkio_endpoints(builder),
   }),
 });
 
@@ -182,4 +184,15 @@ export const {
   useGetNgoCampaignMutation,
   useGetDonationsMutation,
   useGetCommentsMutation,
+
+  // ----------------------------- [ linkio ]
+  useGetLinkioBanksMutation,
+  useGetLinkioVendorsMutation,
+  useGetLinkioRatesMutation,
+  useCreateLinkioOnrampMutation,
+  useCreateLinkioOfframpMutation,
+  useGetLinkioTransactionMutation,
+  useGetLinkioTransactionHistoryMutation,
+  useGetLinkioDepositWalletsMutation,
+  useGetLinkioVerifyAccountNumberMutation,
 } = api;

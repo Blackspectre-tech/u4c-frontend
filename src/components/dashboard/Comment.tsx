@@ -3,7 +3,7 @@
 import {
   useDeleteCampaignMutation,
   useDeleteCommentMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";

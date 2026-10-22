@@ -10,7 +10,7 @@ import {
   useAddMilestoneImagesMutation,
   useCreateCampaignMutation,
   useGetCampaignNgoMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";

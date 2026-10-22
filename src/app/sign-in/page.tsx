@@ -5,7 +5,7 @@ import {
   useGetKycMutation,
   useGetProfileMutation,
   useSignInMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import {
   setKyc,
   setOnline,

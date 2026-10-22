@@ -11,7 +11,7 @@ import { PhoneInput } from "react-international-phone";
 import { useDispatch, useSelector } from "react-redux";
 import "react-international-phone/style.css";
 import { RootState } from "@/redux/store";
-import { useAddHashMutation } from "@/redux/api/main";
+import { useAddHashMutation } from "@/redux/api/_main";
 import Image from "next/image";
 import { useWallets } from "@privy-io/react-auth";
 import {

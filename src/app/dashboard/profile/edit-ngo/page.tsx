@@ -10,7 +10,7 @@ import {
   useGetNgoMutation,
   usePatchCampaignMutation,
   usePatchNgoMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

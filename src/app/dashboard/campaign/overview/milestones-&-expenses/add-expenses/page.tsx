@@ -8,7 +8,7 @@ import { NavigationTemplate } from "@/components/utilities/utils.template";
 import {
   useAddExpensesMutation,
   useCreateCampaignMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";

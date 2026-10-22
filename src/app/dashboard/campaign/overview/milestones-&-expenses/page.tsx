@@ -13,7 +13,7 @@ import { NavigationTemplate } from "@/components/utilities/utils.template";
 import {
   useDeleteExpensesMutation,
   useGetMilestoneMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import {
   Get_Campaign_Details,

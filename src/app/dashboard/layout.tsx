@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useGetKycMutation, useGetProfileMutation } from "@/redux/api/main";
+import { useGetKycMutation, useGetProfileMutation } from "@/redux/api/_main";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import {

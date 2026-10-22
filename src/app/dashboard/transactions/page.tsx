@@ -6,7 +6,7 @@ import {
   response_message,
 } from "@/components/utilities/utils";
 import { NavigationTemplate } from "@/components/utilities/utils.template";
-import { useGetTransactionHistoryMutation } from "@/redux/api/main";
+import { useGetTransactionHistoryMutation } from "@/redux/api/_main";
 import Link from "next/link";
 import { useEffect } from "react";
 import { FaCoins } from "react-icons/fa";

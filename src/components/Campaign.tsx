@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteCampaignMutation } from "@/redux/api/main";
+import { useDeleteCampaignMutation } from "@/redux/api/_main";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";

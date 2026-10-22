@@ -9,7 +9,7 @@ import {
 import {
   useAddWalletAddressMutation,
   useGetCampaignNgoMutation,
-} from "@/redux/api/main";
+} from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import { Create_Campaign } from "@/Wallet/ConnectContract";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";

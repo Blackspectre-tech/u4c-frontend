@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CampaignCard from "@/components/Campaign";
-import { useGetCampaignAwaitMutation } from "@/redux/api/main";
+import { useGetCampaignAwaitMutation } from "@/redux/api/_main";
 import { RiFileForbidFill } from "react-icons/ri";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";

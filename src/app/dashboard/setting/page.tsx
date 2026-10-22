@@ -2,7 +2,7 @@
 
 import { response_message } from "@/components/utilities/utils";
 import { NavigationTemplate } from "@/components/utilities/utils.template";
-import { useUploadAvatarMutation } from "@/redux/api/main";
+import { useUploadAvatarMutation } from "@/redux/api/_main";
 import { setDefault, setRefetch } from "@/redux/slice/users";
 import { RootState } from "@/redux/store";
 import { useLogOut } from "@/Wallet/privy/privy.utils";

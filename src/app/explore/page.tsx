@@ -5,7 +5,7 @@ import ExploreFilter from "@/components/ExploreFilter";
 import Hero from "@/components/Hero";
 import Pagination from "@/components/Pagination";
 import { get_time_expiry } from "@/components/utilities/utils";
-import { useGetPopularCampaignQuery } from "@/redux/api/main";
+import { useGetPopularCampaignQuery } from "@/redux/api/_main";
 import { use, useEffect, useState } from "react";
 
 export default function Home() {

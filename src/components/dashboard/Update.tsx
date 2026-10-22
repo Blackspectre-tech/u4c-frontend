@@ -7,7 +7,7 @@ import { IoClose } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { MdDeleteForever, MdOutlineDeleteForever } from "react-icons/md";
 import { response_message } from "@/components/utilities/utils";
-import { useDeleteUpdateMutation } from "@/redux/api/main";
+import { useDeleteUpdateMutation } from "@/redux/api/_main";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaQuoteLeft } from "react-icons/fa";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetFaqsQuery } from "@/redux/api/main";
+import { useGetFaqsQuery } from "@/redux/api/_main";
 import React from "react";
 import Faq from "./Faq";
 

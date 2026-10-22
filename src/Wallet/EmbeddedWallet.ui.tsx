@@ -1,96 +1,51 @@
 "use client";
 
-import { IoClose, IoCopy, IoWallet } from "react-icons/io5";
-import Image from "next/image";
-import {
-  capitalize,
-  format_currency,
-  response_message,
-  truncate_balance,
-} from "@/components/utilities/utils";
-import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { response_message } from "@/components/utilities/utils";
 import {
   FetchAllTokens,
   Get_Merged_Wallet_History,
-  Get_Token_Logo,
-  Get_Wallet_History,
   GetPrices,
   PUBLIC_CLIENT,
   smart_wait_for_receipt_universal,
   useGetWallet,
 } from "./privy/privy.utils";
 import { useEffect, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { FaEye, FaEyeSlash, FaPaste, FaQuestion } from "react-icons/fa";
-import { setHideBalance, setWalletType } from "@/redux/slice/users";
-import { PiHandWithdraw, PiMoneyWavy } from "react-icons/pi";
-import CustomSelector from "@/components/SelectTag";
+import { setHideBalance } from "@/redux/slice/users";
 import { useSendTransaction } from "@privy-io/react-auth";
 import { encodeFunctionData, erc20Abi, parseUnits, isAddress } from "viem";
-import { RiListSettingsFill } from "react-icons/ri";
-import { MdKeyboardBackspace } from "react-icons/md";
-import { FaCircleQuestion } from "react-icons/fa6";
 import { checkDeployment } from "./ConnectSmartContract";
-import { IoMdSwap } from "react-icons/io";
-
-// ------------------------------------------------------------------------------------------------ [  ]
-// ------------------------------------------------------------------------------------------------ [  ]
-const image = [
-  "/icons/polygon-logo.png",
-  "/icons/usdc-logo.png",
-  "/icons/usdt-logo.png",
-];
-
-type modal_type = "dashboard" | "receive" | "history" | "fund" | "transfer";
-
-// ------------------------------------------------------------------------------------------------ [  ]
-// ------------------------------------------------------------------------------------------------ [  ]
-
-// ----------------------------------------------------------------------------------------------------------- [  ]
-// ----------------------------------------------------------------------------------------------------------- [  ]
-// ----------------------------------------------------------------------------------------------------------- [  ]
-// ----------------------------------------------------------------------------------------------------------- [  ]
-const HistoryTokenLogo = ({
-  symbol,
-  address,
-}: {
-  symbol: string;
-  address: string;
-}) => {
-  const [hasError, setHasError] = useState(false);
-
-  // Get the URL from your helper
-  const logoUrl = Get_Token_Logo(symbol, address);
-
-  // If the helper returned an empty string or the Image component failed to load
-  if (hasError || !logoUrl) {
-    return (
-      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
-        <FaQuestion className="text-sm text-gray-400" />
-      </div>
-    );
-  }
-
-  return (
-    <Image
-      src={logoUrl}
-      alt={symbol}
-      width={35}
-      height={35}
-      className="rounded-full"
-      // 🟢 This correctly triggers a re-render for THIS specific image
-      onError={() => setHasError(true)}
-    />
-  );
-};
+import {
+  useCreateLinkioOfframpMutation,
+  useCreateLinkioOnrampMutation,
+  useGetLinkioBanksMutation,
+  useGetLinkioDepositWalletsMutation,
+  useGetLinkioRatesMutation,
+  useGetLinkioTransactionMutation,
+  useGetLinkioTransactionHistoryMutation,
+  useGetLinkioVendorsMutation,
+  useGetLinkioVerifyAccountNumberMutation,
+} from "@/redux/api/_main";
+import { modal_type, LinkioVendor, LinkioBank } from "./components/types";
+import { AccountCheck } from "./components/AccountVerification";
+import { ONRAMP_MIN_NGN, OFFRAMP_MIN_USDC } from "./components/constants";
+import DashboardScreen from "./components/DashboardScreen";
+import ReceiveScreen from "./components/ReceiveScreen";
+import TransferScreen from "./components/TransferScreen";
+import ComingSoonScreen from "./components/ComingSoonScreen";
+import OnrampScreen, { OnrampForm } from "./components/OnrampScreen";
+import OfframpScreen, { OfframpForm } from "./components/OfframpScreen";
+import HistoryScreen, { HistoryTab } from "./components/HistoryScreen";
 
 // ----------------------------------------------------------------------------------------------------------- [  ]
 // ----------------------------------------------------------------------------------------------------------- [  ]
 // ----------------------------------------------------------------------------------------------------------- [  ]
 // ----------------------------------------------------------------------------------------------------------- [  ]
+// This component owns all the state and business logic (wallet data,
+// transfers, Linkio onramp/offramp) and just picks which screen component to
+// render. The screens themselves live in ./components and are pure
+// presentation — see that folder if you're after the JSX for a given screen.
 export default function EmbeddedWallet({
   is_loading,
   open_modal,
@@ -102,11 +57,10 @@ export default function EmbeddedWallet({
   close: () => void;
   address: string;
 }) {
-  const { hide_balance, wallet_type } = useSelector(
+  const { hide_balance, wallet_type, online } = useSelector(
     (state: RootState) => state.user,
   );
   const [validAddress, setValidAddress] = useState<boolean>(false);
-  const [imageFallback, setImgFallback] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<any[]>([]);
   const [deployed, setDeployed] = useState<boolean>(true);
@@ -144,6 +98,436 @@ export default function EmbeddedWallet({
   });
   const dispatch = useDispatch();
 
+  // Onramp, offramp and transaction-history are the only Linkio endpoints
+  // that require a logged-in session. `online` (not a raw localStorage
+  // token check) is what the rest of the app treats as "logged in" — it's
+  // what the nav bar's Signin/profile switch goes by — so this has to match
+  // or it'll say "logged in" while a stale token sits in localStorage from
+  // an earlier session.
+  const is_logged_in = online === true;
+
+  // ----------------------------------------------------------------- [ Linkio: onramp / offramp ]
+  const [Get_Linkio_Vendors, { isLoading: vendorsLoading }] =
+    useGetLinkioVendorsMutation();
+  const [Get_Linkio_Banks] = useGetLinkioBanksMutation();
+  const [Get_Linkio_Rates] = useGetLinkioRatesMutation();
+  const [Create_Onramp, { isLoading: onrampLoading }] =
+    useCreateLinkioOnrampMutation();
+  const [Create_Offramp, { isLoading: offrampLoading }] =
+    useCreateLinkioOfframpMutation();
+  const [Get_Linkio_Transaction, { isLoading: transactionLoading }] =
+    useGetLinkioTransactionMutation();
+  const [Get_Linkio_Transaction_History] =
+    useGetLinkioTransactionHistoryMutation();
+  const [Get_Linkio_Deposit_Wallets] = useGetLinkioDepositWalletsMutation();
+  const [Get_Linkio_Verify_Account] = useGetLinkioVerifyAccountNumberMutation();
+
+  const [vendors, setVendors] = useState<LinkioVendor[]>([]);
+  const [banks, setBanks] = useState<LinkioBank[]>([]);
+  const [onrampRate, setOnrampRate] = useState<Record<string, number> | null>(
+    null,
+  );
+  const [offrampRate, setOfframpRate] = useState<Record<string, number> | null>(
+    null,
+  );
+
+  // The Polygon address Linkio wants offramp'd crypto sent to. Fetched once
+  // when the offramp screen opens.
+  const [offrampDepositAddress, setOfframpDepositAddress] = useState<
+    string | null
+  >(null);
+
+  const empty_account_check: AccountCheck = {
+    loading: false,
+    name: null,
+    error: false,
+  };
+  const [onrampAccountCheck, setOnrampAccountCheck] =
+    useState<AccountCheck>(empty_account_check);
+  const [offrampAccountCheck, setOfframpAccountCheck] =
+    useState<AccountCheck>(empty_account_check);
+
+  const [onrampForm, setOnrampForm] = useState<OnrampForm>({
+    amount: "",
+    vendor: null,
+    bank_name: "",
+    bank_code: "",
+    account_number: "",
+  });
+  const [onrampResult, setOnrampResult] = useState<any>(null);
+
+  const [offrampForm, setOfframpForm] = useState<OfframpForm>({
+    amount: "",
+    bank_name: "",
+    bank_code: "",
+    account_number: "",
+    account_name: "",
+  });
+  const [offrampResult, setOfframpResult] = useState<any>(null);
+  // "Pay Now" on the offramp result screen — sends the USDC to Linkio's
+  // deposit address, reusing the same Embedded_Transfer/Smart_Transfer the
+  // Send flow already uses.
+  const [offrampPaying, setOfframpPaying] = useState(false);
+  const [offrampPaid, setOfframpPaid] = useState(false);
+
+  const [transactionResult, setTransactionResult] = useState<any>(null);
+
+  // The three tabs on the History screen: the existing on-chain wallet
+  // history, plus the new Linkio onramp/offramp transaction history (the
+  // only Linkio endpoint that actually requires auth).
+  const [historyTab, setHistoryTab] = useState<HistoryTab>("wallet");
+  const [onrampHistory, setOnrampHistory] = useState<any[]>([]);
+  const [onrampHistoryLoading, setOnrampHistoryLoading] = useState(false);
+  const [onrampHistoryNeedsLogin, setOnrampHistoryNeedsLogin] = useState(false);
+  const [offrampHistory, setOfframpHistory] = useState<any[]>([]);
+  const [offrampHistoryLoading, setOfframpHistoryLoading] = useState(false);
+  const [offrampHistoryNeedsLogin, setOfframpHistoryNeedsLogin] =
+    useState(false);
+
+  // Lazily load whatever each screen needs, the first time it's opened.
+  useEffect(() => {
+    if (open === "onramp" && vendors.length === 0) {
+      (async () => {
+        const result = await Get_Linkio_Vendors({ params: {} });
+
+        console.log("[ Vendors ]: ", result);
+        // Confirmed 2026-10-22: now that the backend returns live vendor
+        // data instead of test data, the key is capitalized `Vendors` —
+        // same shift that happened to banks' `Banks` key earlier.
+        setVendors((result as any)?.data?.Vendors || []);
+      })();
+    }
+
+    if ((open === "onramp" || open === "offramp") && banks.length === 0) {
+      (async () => {
+        const result = await Get_Linkio_Banks({ params: {} });
+
+        console.log("[ Banks ]: ", result);
+        // Confirmed 2026-10-21: the real key is capitalized `Banks`.
+        setBanks((result as any)?.data?.Banks || []);
+      })();
+    }
+
+    if (open === "offramp" && !offrampDepositAddress) {
+      (async () => {
+        const result = await Get_Linkio_Deposit_Wallets({ params: {} });
+
+        console.log("[ Deposit-Wallets ]: ", result);
+        const wallets = (result as any)?.data?.Wallets || [];
+        const polygon = wallets.find(
+          (w: any) => String(w?.network).toLowerCase() === "polygon",
+        );
+        if (polygon?.address) setOfframpDepositAddress(polygon.address);
+      })();
+    }
+
+    if (open === "onramp" && !onrampRate) {
+      (async () => {
+        const result = await Get_Linkio_Rates({
+          params: { trx_type: "onramp" },
+        });
+
+        console.log("[ Onramp-Rates ]: ", result);
+        if (!("error" in (result as any))) setOnrampRate((result as any).data);
+      })();
+    }
+
+    if (open === "offramp" && !offrampRate) {
+      (async () => {
+        const result = await Get_Linkio_Rates({
+          params: { trx_type: "offramp" },
+        });
+
+        console.log("[ Oframp-Rates ]: ", result);
+        if (!("error" in (result as any))) setOfframpRate((result as any).data);
+      })();
+    }
+
+    return () => {};
+  }, [open]);
+
+  // Verify the typed account number against the selected bank, half a
+  // second after the user stops typing (so it doesn't fire on every
+  // keystroke). Needs both a bank_code (from the bank dropdown) and a full
+  // 10-digit account number.
+  useEffect(() => {
+    if (!onrampForm.bank_code || onrampForm.account_number.length !== 10) {
+      setOnrampAccountCheck(empty_account_check);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      setOnrampAccountCheck({ loading: true, name: null, error: false });
+
+      const result = await Get_Linkio_Verify_Account({
+        params: {
+          account_number: onrampForm.account_number,
+          bank_code: onrampForm.bank_code,
+        },
+      });
+
+      const name = (result as any)?.data?.data?.account_name || null;
+      setOnrampAccountCheck({ loading: false, name, error: !name });
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [onrampForm.bank_code, onrampForm.account_number]);
+
+  useEffect(() => {
+    if (!offrampForm.bank_code || offrampForm.account_number.length !== 10) {
+      setOfframpAccountCheck(empty_account_check);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      setOfframpAccountCheck({ loading: true, name: null, error: false });
+
+      const result = await Get_Linkio_Verify_Account({
+        params: {
+          account_number: offrampForm.account_number,
+          bank_code: offrampForm.bank_code,
+        },
+      });
+
+      const name = (result as any)?.data?.data?.account_name || null;
+      setOfframpAccountCheck({ loading: false, name, error: !name });
+
+      // Offramp sends account_name to Linkio, so pre-fill it with the
+      // verified name — the user can still edit it if needed.
+      if (name) setOfframpForm((prev) => ({ ...prev, account_name: name }));
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [offrampForm.bank_code, offrampForm.account_number]);
+
+  // Load onramp/offramp history the first time its tab is opened. Confirmed
+  // 2026-10-19: it's a standard DRF-paginated list, { count, next, previous,
+  // results: [...] } — read `.results` first, with a couple of fallbacks
+  // kept around in case onramp/offramp ever differ from each other.
+  useEffect(() => {
+    if (open !== "history") return;
+
+    if (historyTab === "onramp" && onrampHistory.length === 0) {
+      if (!is_logged_in) {
+        setOnrampHistoryNeedsLogin(true);
+      } else {
+        setOnrampHistoryLoading(true);
+        (async () => {
+          const result = await Get_Linkio_Transaction_History({
+            params: { wallet_address: address, transaction_type: "ONRAMP" },
+          });
+          setOnrampHistoryLoading(false);
+          console.log("[ Onramp-History ]: ", result);
+
+          if ("error" in (result as any)) {
+            setOnrampHistoryNeedsLogin(true);
+            return;
+          }
+
+          const data = (result as any)?.data;
+          setOnrampHistory(
+            Array.isArray(data?.results)
+              ? data.results
+              : Array.isArray(data?.transactions)
+                ? data.transactions
+                : Array.isArray(data)
+                  ? data
+                  : [],
+          );
+        })();
+      }
+    }
+
+    if (historyTab === "offramp" && offrampHistory.length === 0) {
+      if (!is_logged_in) {
+        setOfframpHistoryNeedsLogin(true);
+      } else {
+        setOfframpHistoryLoading(true);
+        (async () => {
+          const result = await Get_Linkio_Transaction_History({
+            params: { wallet_address: address, transaction_type: "OFFRAMP" },
+          });
+          setOfframpHistoryLoading(false);
+
+          console.log("[ Offramp-History ]: ", result);
+
+          if ("error" in (result as any)) {
+            setOfframpHistoryNeedsLogin(true);
+            return;
+          }
+
+          const data = (result as any)?.data;
+          setOfframpHistory(
+            Array.isArray(data?.results)
+              ? data.results
+              : Array.isArray(data?.transactions)
+                ? data.transactions
+                : Array.isArray(data)
+                  ? data
+                  : [],
+          );
+        })();
+      }
+    }
+
+    return () => {};
+  }, [open, historyTab]);
+
+  // Linkio's own errors (e.g. "below minimum") come back in a different
+  // shape than our backend's own field-validation errors, so check both. If
+  // it's specifically a minimum-amount violation, surface the real number
+  // from the response rather than a generic message, in case our own
+  // ONRAMP_MIN_NGN/OFFRAMP_MIN_USDC constants ever drift from Linkio's.
+  const extract_linkio_error = (result: any): string => {
+    const data = result?.error?.data;
+
+    if (
+      data?.code === "TXN_MINIMUM_VIOLATION" &&
+      data?.details?.minimum_allowed
+    )
+      return `Minimum amount is ${data.details.minimum_allowed}.`;
+
+    return data?.errors?.[0]?.detail || data?.message || "Something went wrong";
+  };
+
+  const submit_onramp = async () => {
+    if (!onrampForm.amount || Number(onrampForm.amount) <= 0)
+      return response_message({ message: "Enter an amount", option: "wrn" });
+    if (Number(onrampForm.amount) < ONRAMP_MIN_NGN)
+      return response_message({
+        message: `Minimum amount is ₦${ONRAMP_MIN_NGN.toLocaleString()}.`,
+        option: "wrn",
+      });
+    if (!onrampForm.vendor)
+      return response_message({ message: "Select a vendor", option: "wrn" });
+    if (!onrampForm.bank_code || !onrampForm.account_number)
+      return response_message({
+        message: "Select your bank and enter your account number",
+        option: "wrn",
+      });
+    if (!onrampAccountCheck.name)
+      return response_message({
+        message: "We couldn't verify this account number",
+        option: "wrn",
+      });
+
+    const result = await Create_Onramp({
+      body: {
+        currency: "NGN",
+        amount: String(onrampForm.amount),
+        vendor_bank: onrampForm.vendor.vendorBank,
+        vendor_number: onrampForm.vendor.vendorNumber,
+        vendor_name: onrampForm.vendor.venderName,
+        wallet_address: address,
+        bank_name: onrampForm.bank_name,
+        account_number: onrampForm.account_number,
+        network: "polygon",
+        stables: "USDC",
+      },
+    });
+
+    if ("error" in (result as any))
+      return response_message({
+        message: extract_linkio_error(result),
+        option: "err",
+      });
+
+    setOnrampResult(
+      (result as any)?.data?.transaction || (result as any)?.data,
+    );
+  };
+
+  const submit_offramp = async () => {
+    if (!offrampForm.amount || Number(offrampForm.amount) <= 0)
+      return response_message({ message: "Enter an amount", option: "wrn" });
+    if (Number(offrampForm.amount) < OFFRAMP_MIN_USDC)
+      return response_message({
+        message: `Minimum amount is ${OFFRAMP_MIN_USDC} USDC.`,
+        option: "wrn",
+      });
+    if (!offrampForm.bank_code || !offrampForm.account_number)
+      return response_message({
+        message: "Select your payout bank and enter your account number",
+        option: "wrn",
+      });
+    if (!offrampAccountCheck.name)
+      return response_message({
+        message: "We couldn't verify this account number",
+        option: "wrn",
+      });
+    if (!offrampForm.account_name)
+      return response_message({
+        message: "Enter the account name",
+        option: "wrn",
+      });
+
+    const result = await Create_Offramp({
+      body: {
+        currency: "NGN",
+        amount: String(offrampForm.amount),
+        wallet_address: address,
+        bank_name: offrampForm.bank_name,
+        account_number: offrampForm.account_number,
+        account_name: offrampForm.account_name,
+        network: "polygon",
+        stables: "USDC",
+      },
+    });
+
+    if ("error" in (result as any))
+      return response_message({
+        message: extract_linkio_error(result),
+        option: "err",
+      });
+
+    setOfframpResult(
+      (result as any)?.data?.transaction || (result as any)?.data,
+    );
+  };
+
+  const check_linkio_transaction = async (trx_ref: string) => {
+    const result = await Get_Linkio_Transaction({ params: { trx_ref } });
+    console.log("[ Transaction-Result ]: ", result);
+
+    if ("error" in (result as any))
+      return response_message({
+        message: "Unable to check status right now, try again shortly.",
+        option: "wrn",
+      });
+
+    setTransactionResult(
+      (result as any)?.data?.transactions || (result as any)?.data,
+    );
+  };
+
+  const reset_onramp = () => {
+    setOnrampForm({
+      amount: "",
+      vendor: null,
+      bank_name: "",
+      bank_code: "",
+      account_number: "",
+    });
+    setOnrampResult(null);
+    setTransactionResult(null);
+    setOnrampAccountCheck(empty_account_check);
+  };
+
+  const reset_offramp = () => {
+    setOfframpForm({
+      amount: "",
+      bank_name: "",
+      bank_code: "",
+      account_number: "",
+      account_name: "",
+    });
+    setOfframpResult(null);
+    setTransactionResult(null);
+    setOfframpAccountCheck(empty_account_check);
+    setOfframpPaying(false);
+    setOfframpPaid(false);
+  };
+
   useEffect(() => {
     (async () => {
       const wallet = await FetchAllTokens(address);
@@ -165,64 +549,15 @@ export default function EmbeddedWallet({
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
-  const copy_to_clipboard = async (value: string) => {
-    const scc_msg = "Address copied.";
-    const err_msg = "Something went wrong.";
-
-    if (!navigator.clipboard) {
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = value;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand("copy");
-        response_message({ message: scc_msg, option: "scc" });
-      } catch (err) {
-        console.error("Fallback: Oops, unable to copy", err);
-        response_message({ message: err_msg, option: "wrn" });
-      }
-      document.body.removeChild(textArea);
-      return;
-    }
-
-    navigator.clipboard.writeText(value).then(
-      () => response_message({ message: scc_msg, option: "scc" }),
-      () => response_message({ message: err_msg, option: "wrn" }),
-    );
-  };
-
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  const copy_from_clipboard = async () => {
-    const scc_msg = "Wallet address pasted successfully.";
-    const err_msg = "Something went wrong.";
-
+  // Takes explicit args (rather than reading formData directly) so it can
+  // also be used to pay an offramp request's deposit address, not just the
+  // Transfer screen's own recipient field.
+  const Embedded_Transfer = async (
+    token: string | null,
+    amount: number,
+    recipient: string,
+  ) => {
     try {
-      // 1. Request text from clipboard
-      const text = await navigator.clipboard.readText();
-      setFormData((prev) => ({ ...prev, receiver_address: text }));
-
-      if (isAddress(text)) setValidAddress(true);
-      else setValidAddress(false);
-      // response_message({ message: scc_msg, option: "scc" });
-    } catch (err) {
-      // This happens if the user denies the 'Paste' permission popup
-      console.error("Failed to read clipboard: ", err);
-      // response_message({ message: err_msg, option: "wrn" });
-    }
-  };
-
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  // ------------------------------------------------------------------------------------------------------------------- [  ]
-  const Embedded_Transfer = async () => {
-    try {
-      const { token, amount, receiver_address: recipient } = formData;
-
       // 1.
       if (!token) {
         response_message({
@@ -302,9 +637,11 @@ export default function EmbeddedWallet({
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
-  const Smart_Transfer = async () => {
-    const { token, amount, receiver_address: recipient } = formData;
-
+  const Smart_Transfer = async (
+    token: string | null,
+    amount: number,
+    recipient: string,
+  ) => {
     // 1. Validations
     if (!token) {
       response_message({ message: "Select token first", option: "wrn" });
@@ -405,10 +742,48 @@ export default function EmbeddedWallet({
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
-  function truncate(text: string, first = 1) {
-    if (text.length <= 10) return text;
-    return first === 1 ? text.slice(0, 5) : text.slice(-5);
-  }
+  // "Pay Now" on the offramp result screen. Sends the USDC the user just
+  // requested to sell straight to Linkio's Polygon deposit address, reusing
+  // the same transfer logic the Send flow uses — just with explicit args
+  // instead of reading the Transfer screen's own formData.
+  const pay_offramp_deposit = async () => {
+    if (!offrampDepositAddress) {
+      return response_message({
+        message: "Deposit address isn't available yet, try again shortly.",
+        option: "wrn",
+      });
+    }
+
+    setOfframpPaying(true);
+
+    try {
+      let status = false;
+
+      if (wallet_type === "embedded-wallet")
+        status = await Embedded_Transfer(
+          "USDC",
+          Number(offrampForm.amount),
+          offrampDepositAddress,
+        );
+      else if (wallet_type === "smart-wallet")
+        status = await Smart_Transfer(
+          "USDC",
+          Number(offrampForm.amount),
+          offrampDepositAddress,
+        );
+
+      if (status === true) {
+        response_message({
+          message: "Payment sent. We'll process your payout shortly.",
+          option: "scc",
+        });
+        setOfframpPaid(true);
+        setRefetch((prev) => !prev); // refresh wallet balance — funds just left
+      }
+    } finally {
+      setOfframpPaying(false);
+    }
+  };
 
   // ------------------------------------------------------------------------------------------------------------------- [  ]
   // ------------------------------------------------------------------------------------------------------------------- [  ]
@@ -421,8 +796,18 @@ export default function EmbeddedWallet({
       console.log("[ wallet_type ]: ", wallet_type);
       let status = false;
 
-      if (wallet_type === "embedded-wallet") status = await Embedded_Transfer();
-      else if (wallet_type === "smart-wallet") status = await Smart_Transfer();
+      if (wallet_type === "embedded-wallet")
+        status = await Embedded_Transfer(
+          formData.token,
+          formData.amount,
+          formData.receiver_address,
+        );
+      else if (wallet_type === "smart-wallet")
+        status = await Smart_Transfer(
+          formData.token,
+          formData.amount,
+          formData.receiver_address,
+        );
 
       if (status === true) {
         response_message({ message: "Transfer Successful", option: "scc" });
@@ -436,575 +821,105 @@ export default function EmbeddedWallet({
     }
   };
 
-  // console.log("\n\n\n[ ************************************ ]");
-  // console.log("[ ************************************ ]");
-  // console.log("[ ************************************ ]");
-  // console.log("[ ************************************ ]");
-  // console.log("is-wallet-deployed::: ", deployed);
-  // console.log("price::: ", price);
-  // console.log("history::: ", history);
-  // console.log("address::: ", address);
-  // console.log("formData::: ", formData);
-
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-white/20 backdrop-blur-sm z-1000 flex items-center justify-center px-5 sm:px-0">
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+    <div className="fixed top-0 left-0 w-full h-full bg-gray-800/40 backdrop-blur-sm z-1000 flex items-center justify-center px-5 sm:px-0">
       {open === "dashboard" && (
-        <div className="flex flex-col items-center w-full sm:w-150">
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* <WalletSelection
-            wallet_type={wallet_type}
-            action={(value: "embedded-wallet" | "smart-wallet") => {
-              dispatch(setWalletType(value));
-            }}
-          /> */}
-
-          <div className="w-full bg-white relative rounded-2xl shadow-xl p-7">
-            <div
-              onClick={close}
-              className="absolute cursor-pointer top-7 right-7"
-            >
-              <IoClose className={"text-xl"} />
-            </div>
-
-            <div className="w-full">
-              <div className="flex items-center justify-center gap-3">
-                <h1 className="text-gray-500 text-sm">Total balance</h1>
-
-                {hide_balance ? (
-                  <FaEye
-                    onClick={() => dispatch(setHideBalance(false))}
-                    className={`cursor-pointer text-[0.95rem]`}
-                  />
-                ) : (
-                  <FaEyeSlash
-                    onClick={() => dispatch(setHideBalance(true))}
-                    className={`cursor-pointer text-[0.95rem]`}
-                  />
-                )}
-              </div>
-
-              <h1 className="text-center text-4xl mt-3">
-                {hide_balance
-                  ? "**********"
-                  : `$ ${format_currency(Number(price?.total_usd))}`}
-              </h1>
-            </div>
-
-            <div className="flex justify-center mt-5">
-              <div className="bg-gray-200 flex flex-wrap justify-center gap-2 rounded-2xl p-1">
-                <button
-                  onClick={() => setOpen("receive")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <GoArrowDownLeft className={"text-xl"} />{" "}
-                  <p className="text-sm">receive</p>
-                </button>
-
-                <button
-                  onClick={() => setOpen("transfer")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <GoArrowUpRight className={"text-xl"} />{" "}
-                  <p className="text-sm">Send</p>
-                </button>
-
-                <button
-                  onClick={() => setOpen("fund")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <PiMoneyWavy className={"text-xl"} />{" "}
-                  <p className="text-sm">Fund</p>
-                </button>
-
-                <button
-                  onClick={() => setOpen("fund")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <PiHandWithdraw className={"text-xl"} />{" "}
-                  <p className="text-sm">Withdraw</p>
-                </button>
-
-                <button
-                  onClick={() => setOpen("fund")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <IoMdSwap className={"text-xl"} />{" "}
-                  <p className="text-sm">Swap</p>
-                </button>
-
-                <button
-                  onClick={() => setOpen("history")}
-                  className={`flex flex-col items-center cursor-pointer gap-1 rounded-xl text-gray-800 py-2 px-5`}
-                >
-                  <RiListSettingsFill className={"text-xl"} />{" "}
-                  <p className="text-sm">History</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="w-[30%] border-b border-gray-200 mt-5 mb-10 mx-auto"></div>
-
-            <div className="flex flex-col gap-5 mt-10 px-3">
-              <div className="flex justify-between items-center gap-2">
-                <Image
-                  src={image[0]}
-                  alt=""
-                  width={35}
-                  height={35}
-                  className=""
-                />
-
-                <div className="flex flex-1 justify-between items-center gap-4">
-                  <div className="">
-                    <h1 className="text-[1.0rem] font-semibold">Polygon</h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.token?.pol} $
-                    </h1>
-                  </div>
-
-                  <div className="">
-                    <h1 className="text-lg font-semibold">
-                      {format_currency(Number(wallet?.pol))}
-                    </h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.breakdown?.pol} $
-                    </h1>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center gap-2">
-                <Image
-                  src={image[1]}
-                  alt=""
-                  width={35}
-                  height={35}
-                  className=""
-                />
-
-                <div className="flex flex-1 justify-between items-center gap-4">
-                  <div className="">
-                    <h1 className="text-[1.0rem] font-semibold">USDC</h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.token?.usdc} $
-                    </h1>
-                  </div>
-
-                  <div className="">
-                    <h1 className="text-lg font-semibold">
-                      {format_currency(Number(wallet?.usdc))}
-                    </h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.breakdown?.usdc} $
-                    </h1>
-                  </div>
-                </div>
-              </div>
-
-              {/* <div className="flex justify-between items-center gap-2">
-                <Image
-                  src={image[2]}
-                  alt=""
-                  width={35}
-                  height={35}
-                  className=""
-                />
-
-                <div className="flex flex-1 justify-between items-center gap-4">
-                  <div className="">
-                    <h1 className="text-[1.0rem] font-semibold">USDT</h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.token?.usdt} $
-                    </h1>
-                  </div>
-
-                  <div className="">
-                    <h1 className="text-lg font-semibold">
-                      {format_currency(Number(wallet?.usdt))}
-                    </h1>
-                    <h1 className="text-[0.9rem] text-gray-600">
-                      {price?.breakdown?.usdt} $
-                    </h1>
-                  </div>
-                </div>
-              </div> */}
-            </div>
-
-            <div className="flex justify-center gap-5 mt-10">
-              <button
-                onClick={open_modal}
-                className={`w-[70%] flex justify-center items-center gap-1 gradient-cto rounded-xl px-5 py-3`}
-              >
-                {is_loading && (
-                  <AiOutlineLoading3Quarters className="button_loading_ text-[1.2rem] mr-1" />
-                )}
-                <IoWallet className={"text-xl"} />{" "}
-                <p className="text-[0.9rem]">Disconnect</p>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {open === "receive" && (
-        <div className="w-full sm:w-120">
-          <div className="bg-white relative rounded-2xl shadow-xl p-7">
-            <div
-              onClick={() => setOpen("dashboard")}
-              className="absolute cursor-pointer top-7 left-7"
-            >
-              <MdKeyboardBackspace className={"text-xl"} />
-            </div>
-
-            <div className="w-full flex items-center justify-center mt-10">
-              <QRCodeSVG
-                value={address}
-                size={230}
-                level="H" // High error correction (good for phone screens)
-                includeMargin={false}
-              />
-            </div>
-
-            <div className="w-[30%] border-b border-gray-200 mt-5 mb-5 mx-auto"></div>
-
-            <div className="bg-gray-200 flex justify-between items-center rounded-xl gap-5 mt-10 py-2 pr-2 pl-4">
-              <p className="flex-1 line-clamp-1 text-primary text-xl">
-                {truncate(address)} <span className="text-black">.....</span>{" "}
-                {truncate(address, 0)}
-              </p>
-
-              <button
-                onClick={() => copy_to_clipboard(address)}
-                className={`flex justify-center cursor-pointer gap-1 bg-gray-500 text-white rounded-xl px-4 py-3`}
-              >
-                <IoCopy className={"text-xl"} />{" "}
-              </button>
-            </div>
-
-            <p className="text-red-600 text-sm text-center mt-5">
-              Please note that this is the native USDC on the POLYGON network,
-              please verify the contract address before depositing
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {open === "transfer" && (
-        <div className="w-full sm:w-120">
-          <div className="bg-white relative rounded-2xl shadow-xl p-7">
-            <div
-              onClick={() => setOpen("dashboard")}
-              className="absolute cursor-pointer top-7 left-7"
-            >
-              <MdKeyboardBackspace className={"text-xl"} />
-            </div>
-
-            <div className="w-full">
-              <div className="flex items-center justify-center gap-3">
-                <h1 className="text-gray-500 text-sm capitalize">
-                  {formData.token || "Token"} Balance
-                </h1>
-              </div>
-
-              <h1 className="text-center text-4xl mt-3">
-                {truncate_balance(
-                  Number(
-                    formData.token === "POLYGON"
-                      ? wallet?.pol
-                      : formData.token === "USDC"
-                        ? wallet?.usdc
-                        : // : formData.token === "USDT"
-                          //   ? wallet?.usdt
-                          "0.0",
-                  ),
-                  6,
-                )}
-              </h1>
-            </div>
-
-            <div className="mt-10">
-              <div className="">
-                <CustomSelector
-                  optionsList={[
-                    "POLYGON_0",
-                    "USDC_1",
-                    // "USDT_2"
-                  ]}
-                  placeholder="Currency"
-                  changeEvent={(selected) =>
-                    setFormData((prev: any) => ({
-                      ...prev,
-                      token: String(selected?.value ?? "").split("_")[0],
-                    }))
-                  }
-                  mapOption={(val: string) => ({
-                    value: val,
-                    name: val,
-                    label: (
-                      <div className="flex items-center gap-1">
-                        <div className="min-w-10 min-h-[2.63rem] rounded-l-md flex justify-center items-center">
-                          <Image
-                            src={
-                              image[
-                                Number(
-                                  val
-                                    ?.replace("POLYGON_", "")
-                                    ?.replace("USDC_", "") ||
-                                    // ?.replace("USDT_", "")
-                                    0,
-                                )
-                              ]
-                            }
-                            alt=""
-                            width={25}
-                            height={25}
-                          />
-                        </div>
-                        <p>{val?.replace("_0", "")?.replace("_1", "")}</p>
-                      </div>
-                    ),
-                  })}
-                />
-              </div>
-
-              <div className="">
-                <input
-                  required
-                  type="number"
-                  value={formData.amount}
-                  onChange={(val) =>
-                    setFormData((prev: any) => ({
-                      ...prev,
-                      amount: val.target.value,
-                    }))
-                  }
-                  // placeholder="**********"
-                  className="w-full px-5 py-3 border border-black/15 hover:border-black/30 outline-0 rounded-lg mt-3"
-                />
-              </div>
-            </div>
-
-            <div className="w-[30%] border-b border-gray-200 mt-5 mb-5 mx-auto"></div>
-
-            <div className="bg-gray-200 flex flex-col min-[380px]:flex-row justify-between items-center rounded-xl gap-5 mt-10 py-2 pr-2 pl-2 min-[380px]:pl-4">
-              <input
-                className="w-full min-[380px]:w-auto flex-1 line-clamp-1 bg-transparent outline-0 p-3 min-[380px]:p-0"
-                placeholder="receivers address..."
-                value={formData.receiver_address}
-                onChange={(val) => {
-                  const address_ = val.target.value;
-                  setFormData((prev) => ({
-                    ...prev,
-                    receiver_address: address_,
-                  }));
-
-                  if (isAddress(address_)) setValidAddress(true);
-                  else setValidAddress(false);
-                }}
-                type="text"
-              />
-
-              <button
-                onClick={copy_from_clipboard}
-                className={`w-full min-[380px]:w-auto flex justify-center cursor-pointer gap-1 bg-gray-500 text-white rounded-lg px-4 py-3`}
-              >
-                <FaPaste className={"text-xl"} />{" "}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center mt-5">
-              <button
-                onClick={CustomTransfer}
-                disabled={!validAddress}
-                className={`w-full flex justify-center items-center gap-1 ${validAddress ? "gradient-cto" : "bg-gray-500 text-white"} rounded-xl px-5 py-4`}
-              >
-                {isLoading && (
-                  <AiOutlineLoading3Quarters className="button_loading_ text-[1.3rem]" />
-                )}
-                <IoWallet className={"text-xl"} />{" "}
-                <p className="text-[0.9rem]">Transfer</p>
-              </button>
-            </div>
-
-            <p className="text-red-600 text-sm text-center mt-5">
-              Please note that this is the native USDC on the POLYGON network,
-              please verify the contract address before depositing.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {open === "fund" && (
-        <div className="w-full sm:w-120">
-          <div className="bg-white relative rounded-2xl shadow-xl p-7">
-            <div
-              onClick={() => setOpen("dashboard")}
-              className="absolute cursor-pointer top-7 left-7"
-            >
-              <MdKeyboardBackspace className={"text-xl"} />
-            </div>
-
-            <div className="w-full flex flex-col items-center justify-center mt-10">
-              <h1 className="text-2xl font-semibold text-gray-400">
-                Comming Soon
-              </h1>
-              <div className="w-[30%] border-b border-gray-200 mt-5 mb-5 mx-auto"></div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {open === "history" && (
-        <div className="w-full sm:w-120">
-          <div className="bg-white relative rounded-2xl shadow-xl p-7">
-            <div
-              onClick={() => setOpen("dashboard")}
-              className="absolute cursor-pointer top-7 left-7"
-            >
-              <MdKeyboardBackspace className={"text-xl"} />
-            </div>
-
-            <h1 className="text-center text-2xl mt-5">Transaction History</h1>
-
-            <div className="w-[30%] border-b border-gray-200 mt-5 mb-5 mx-auto"></div>
-
-            <div className="max-h-100 overflow-y-auto flex flex-col gap-5 mt-5">
-              {history.map((val, ind) => (
-                <div
-                  key={ind}
-                  className="flex justify-between items-center gap-2"
-                >
-                  <HistoryTokenLogo
-                    symbol={val?.asset}
-                    address={val?.rawContract.address}
-                  />
-
-                  <div className="flex flex-1 justify-between items-center gap-4">
-                    <div className="">
-                      <h1 className="text-[1.0rem] font-semibold">
-                        {val?.asset}
-                      </h1>
-
-                      <div className="text-[0.9rem] text-gray-600 flex items-center gap-2">
-                        {/* <span className="font-semibold">From:</span> */}
-
-                        <div
-                          onClick={() => copy_to_clipboard(val?.hash)}
-                          className="flex items-center gap-1 cursor-pointer"
-                        >
-                          <IoCopy className={"text-sm"} />
-                          <span>{val?.hash?.slice(0, 4)}...</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end">
-                      <h1 className="text-lg font-semibold">
-                        {format_currency(Number(val?.value))}
-                      </h1>
-                      <h1
-                        className={`text-[0.7rem] rounded-sm ${val?.displayType === "Received" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"} px-3 py-[0.20rem]`}
-                      >
-                        {val?.displayType}
-                      </h1>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-{
-  /* -------------------------------------------------------------------------------------------------------------------------------------------- */
-}
-{
-  /* -------------------------------------------------------------------------------------------------------------------------------------------- */
-}
-{
-  /* -------------------------------------------------------------------------------------------------------------------------------------------- */
-}
-{
-  /* -------------------------------------------------------------------------------------------------------------------------------------------- */
-}
-function WalletSelection({
-  wallet_type,
-  action,
-}: {
-  wallet_type: string;
-  action: (val: "embedded-wallet" | "smart-wallet") => void;
-}) {
-  return (
-    <div className="w-[90%] bg-white rounded-2xl p-4 mb-5">
-      <div className="flex items-center gap-1 mb-3">
-        <FaCircleQuestion className="text-lg text-gray-400" />
-        <h1 className="font-semibold">Wallet-Type:</h1>
-      </div>
-
-      <div className="w-full bg-gray-200 rounded-full">
-        <CustomSelector
-          optionsList={["Embedded-Wallet", "Smart-Wallet"]}
-          control_class={"w-full"}
-          control_style={{
-            // borderRadius: "0.5rem",
-            border: "none",
-            padding: "0.30rem 0.65rem",
-            backgroundColor: "",
-            outline: "0",
-            stroke: "0",
-            width: "100%",
-            placeholder: "",
-            flex: 1,
-          }}
-          placeholder={capitalize(wallet_type?.replace("-", " "))}
-          changeEvent={(selected) => {
-            if (!selected) return;
-
-            // console.log("selected");
-            // console.log("selected");
-            // console.log("selected");
-            // console.log(selected);
-
-            action(selected?.value as "embedded-wallet" | "smart-wallet");
-          }}
-          mapOption={(val) => ({
-            value: val,
-            name: val,
-            label: (
-              <div className="flex items-center text-[1rem]">
-                <p>{val}</p>
-              </div>
-            ),
-          })}
+        <DashboardScreen
+          close={close}
+          is_loading={is_loading}
+          is_logged_in={is_logged_in}
+          open_modal={open_modal}
+          hide_balance={hide_balance}
+          onToggleHideBalance={() => dispatch(setHideBalance(!hide_balance))}
+          price={price}
+          wallet={wallet}
+          onNavigate={setOpen}
         />
-      </div>
+      )}
+
+      {open === "receive" && (
+        <ReceiveScreen address={address} onBack={() => setOpen("dashboard")} />
+      )}
+
+      {open === "transfer" && (
+        <TransferScreen
+          wallet={wallet}
+          formData={formData}
+          setFormData={setFormData}
+          validAddress={validAddress}
+          setValidAddress={setValidAddress}
+          isLoading={isLoading}
+          onSubmit={CustomTransfer}
+          onBack={() => setOpen("dashboard")}
+        />
+      )}
+
+      {open === "fund" && (
+        <ComingSoonScreen onBack={() => setOpen("dashboard")} />
+      )}
+
+      {open === "onramp" && (
+        <OnrampScreen
+          onBack={() => {
+            reset_onramp();
+            setOpen("dashboard");
+          }}
+          needsLogin={!is_logged_in}
+          vendors={vendors}
+          vendorsLoading={vendorsLoading}
+          banks={banks}
+          rate={onrampRate}
+          form={onrampForm}
+          setForm={setOnrampForm}
+          accountCheck={onrampAccountCheck}
+          result={onrampResult}
+          loading={onrampLoading}
+          transactionResult={transactionResult}
+          transactionLoading={transactionLoading}
+          onSubmit={submit_onramp}
+          onCheckTransaction={check_linkio_transaction}
+        />
+      )}
+
+      {open === "offramp" && (
+        <OfframpScreen
+          onBack={() => {
+            reset_offramp();
+            setOpen("dashboard");
+          }}
+          needsLogin={!is_logged_in}
+          banks={banks}
+          rate={offrampRate}
+          form={offrampForm}
+          setForm={setOfframpForm}
+          accountCheck={offrampAccountCheck}
+          depositAddress={offrampDepositAddress}
+          result={offrampResult}
+          loading={offrampLoading}
+          transactionResult={transactionResult}
+          transactionLoading={transactionLoading}
+          onSubmit={submit_offramp}
+          onCheckTransaction={check_linkio_transaction}
+          onPayDeposit={pay_offramp_deposit}
+          paying={offrampPaying}
+          paid={offrampPaid}
+        />
+      )}
+
+      {open === "history" && (
+        <HistoryScreen
+          activeTab={historyTab}
+          onChangeTab={setHistoryTab}
+          history={history}
+          onrampHistory={onrampHistory}
+          onrampHistoryLoading={onrampHistoryLoading}
+          onrampHistoryNeedsLogin={onrampHistoryNeedsLogin}
+          offrampHistory={offrampHistory}
+          offrampHistoryLoading={offrampHistoryLoading}
+          offrampHistoryNeedsLogin={offrampHistoryNeedsLogin}
+          onBack={() => setOpen("dashboard")}
+        />
+      )}
     </div>
   );
 }

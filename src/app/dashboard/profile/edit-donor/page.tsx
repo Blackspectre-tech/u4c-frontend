@@ -4,7 +4,7 @@ import BackButton from "@/components/dashboard/BackButton";
 import EditProfile from "@/components/dashboard/EditProfile";
 import { response_message } from "@/components/utilities/utils";
 import { NavigationTemplate } from "@/components/utilities/utils.template";
-import { usePatchUserMutation } from "@/redux/api/main";
+import { usePatchUserMutation } from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";

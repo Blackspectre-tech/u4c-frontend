@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetNgoMutation } from "@/redux/api/main";
+import { useGetNgoMutation } from "@/redux/api/_main";
 import { RootState } from "@/redux/store";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoWallet } from "react-icons/io5";
 import { setWallet, setWalletType } from "@/redux/slice/users";
 import { RootState } from "@/redux/store";
-import { useAddWalletAddressMutation } from "@/redux/api/main";
+import { useAddWalletAddressMutation } from "@/redux/api/_main";
 import { usePrivy } from "@privy-io/react-auth";
 import { response_message } from "@/components/utilities/utils";
 import ExternalWallet from "./ExternalWallet.ui";
